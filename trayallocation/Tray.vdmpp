@@ -1,0 +1,34 @@
+class Tray
+	types
+		public State = <Empty> | <Full>;
+	    public UID = nat
+	    inv u == u < TrayAllocator`NumOfTrays;
+
+	values
+		public TraySize    : nat = 800    -- Size of any tray 
+
+	instance variables
+		public state : State := <Full>;
+
+	operations
+	
+	public IsTrayEmpty: () ==> bool
+	IsTrayEmpty () ==
+		return state = <Empty>;
+
+	public ItemOnTray: Item ==> ()
+	ItemOnTray (item) ==
+	(
+		state := <Full>;
+		item.AssignItemToTray(self);
+	);
+		
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end Tray

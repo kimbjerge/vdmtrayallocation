@@ -1,0 +1,42 @@
+class InductionController
+	types
+
+	values
+		public InductionRate : nat = 3;    -- trays between each item
+
+	instance variables
+		priority : nat := 0;		-- priotity of induction, incremented each time wait to induct item
+		id : nat;					-- Induction ID
+		allocator : TrayAllocator; 	-- TrayAllocator
+		items : set of Item := {};	-- set of items ready to be inducted
+	
+	operations
+
+    -- InductionController constructor
+	public InductionController: TrayAllocator * nat ==> InductionController
+	InductionController(a, n) ==
+	(
+		allocator := a;
+		id := n;
+	);
+
+    -- Enviroment feeds a new item on induction
+	public FeedItem: Item ==> ()
+	FeedItem(i) ==
+		items := items union {i};
+
+    -- Simulate sorter-ring moved one tray step
+	public TrayStep: () ==> ()
+	TrayStep() ==
+	(
+	);
+
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end InductionController

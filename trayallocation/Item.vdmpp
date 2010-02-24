@@ -1,0 +1,39 @@
+class Item
+	types
+
+	values
+		public ItemMaxSize : nat = 1500;  -- Item maximum size in mm
+		public ItemMinSize : nat = 100;   -- Item minimum size in mm
+
+	instance variables
+	    id : nat;	   		-- Item ID 
+	    sizeOfTrays : nat;  -- Number of trays item occupies
+	    trays : set of Tray := {};  
+
+	operations
+	
+    -- InductionController constructor
+	public Item: nat * nat ==> Item
+	Item(i, size) ==
+	(
+		id := i;
+	    sizeOfTrays := size;
+	);
+	
+	public RemoveItem: () ==> ()
+	RemoveItem() ==
+		is not yet specified;
+	
+	public AssignItemToTray: Tray ==> ()
+	AssignItemToTray(tray) ==
+		trays := trays union {tray};
+			
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end Item

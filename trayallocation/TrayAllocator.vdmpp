@@ -1,0 +1,57 @@
+class TrayAllocator
+	types
+
+	values
+		public InductionSeperation: nat = 3;
+		public NumOfInductions : nat = 5;
+		public NumOfTrays : nat = 20
+
+	instance variables
+		currTroughput : nat := 0;
+		inductionGroup : seq of InductionController := [];
+		sorterRing : inmap Tray`UID to Tray;
+		inv card dom sorterRing = NumOfTrays;
+		
+
+	operations
+	
+    -- TrayAllocator constructor
+	public TrayAllocator: SorterEnviroment==> TrayAllocator
+	TrayAllocator(e) ==
+	(
+	    sorterRing := {num |-> new Tray() | num in set {1,...,NumOfTrays}};
+	    inductionGroup := [new InductionController(self, num) | num in set {1,...,NumOfInductions}];
+        e.AssignInductionGroup(inductionGroup);
+	);
+
+    -- Simulate sorter-ring moved one tray step
+	public TrayStep: Tray`UID * Tray`State  ==> ()
+	TrayStep(uid, state) ==
+	(
+		for all i in set {1,...,NumOfInductions} 
+		do 
+		   inductionGroup(i).TrayStep();
+	);
+	
+	public InductItem: InductionController * Item ==> bool
+	InductItem(ic, item) ==
+		is not yet specified;
+	
+	-- Returns true if sorter is full
+	public IsSorterFull: () ==> bool
+	IsSorterFull() ==
+	 return forall id in set dom sorterRing & sorterRing(id).state = <Full>;
+
+	private AllocateTray: () ==> bool
+	AllocateTray() ==
+		is not yet specified;
+		
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end TrayAllocator

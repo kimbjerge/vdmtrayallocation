@@ -1,0 +1,33 @@
+class SC
+	types
+
+	values
+		
+	instance variables
+		allocator : TrayAllocator;
+	
+	operations
+	
+    -- SystemController constructor
+	public SC: SorterEnviroment ==> SC
+	SC(e) ==
+	(
+        allocator := new TrayAllocator(e); 
+	);
+	
+	-- Notified each time sorter-ring has moved one tray step
+	public TrayStep: Tray`UID * Tray`State  ==> ()
+	TrayStep(uid, state) ==
+	(
+		allocator.TrayStep(uid, state);
+	);
+
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end SC
