@@ -1,0 +1,34 @@
+class World
+	types
+
+	values
+
+	instance variables
+		env : SorterEnviroment;
+		timeSteps : set of nat := {1,...,50};
+
+	operations
+	
+	public World: () ==> World
+	World() ==
+	(
+		env := new SorterEnviroment();
+	);
+
+	public Run: () ==> ()
+	Run() ==
+	(
+		for all t in set timeSteps 
+		do 
+			env.TimeStep(t);	 
+	);
+
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end World
