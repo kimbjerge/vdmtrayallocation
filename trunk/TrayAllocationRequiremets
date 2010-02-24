@@ -1,0 +1,34 @@
+The purpose of this model is to model the tray allocation algorithm used to assign trays 
+to parcels that is inducted onto the sortation machine. 
+
+Parcels are inducted onto the trays belonging to the sorter. 
+
+The sortation algorithm must assign a discharge in where the tray is tilted 
+and the parcel is dumped depending on the barcode and sortation tables. 
+
+R1. An induction is capable of induction a number of parcels 
+    within a limited time interval (Eg. hitting each 2-5 trays passing an induction)
+R2. Inductions is grouped in areas with 1-5 inductions in a group
+R3. For each induction group the card reader detects the id of the tray
+R4. A group of inductions are designed so the induction group is able to fill all trays
+    that is passing the induction area
+R5. The sorter has a number of trays on where parcels are inducted
+R6. The sorter is running at a certain speed
+R7. At optimal speed of sorter and induction all trays must be filled with parcels
+R8. The tray allocation algorithm must be able to allocate empty trays to the 
+    induction group so the sorter is filled with parcels optimal (No starvation)
+R9. There must be maximum one item on any tray
+    
+R10. A barcode on the parcels is used to track it and decide on the discharge the parcel 
+    is dumped
+R11. There is a limitation on the number of parcels that can be dumped in a discharge
+R12. A limited number of discharges is connected to the sorter
+R13. Barcodes are looked up in sortation tables to decide on the discharge 
+	to dump the parcel
+	
+Priority of work:
+
+1. Design the tray allocation algorithm to fill the sorter with parcels for 
+   a given configuration of an induction group (R1 - R9)
+
+2. Design the sortation algorithm for dumping parcels in discharge (R10 - R13)
