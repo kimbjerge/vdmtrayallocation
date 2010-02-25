@@ -7,8 +7,11 @@ class TrayAllocator
 		public NumOfTrays : nat = 20
 
 	instance variables
-		currTroughput : nat := 0;
+		currThroughput : nat := 0;
 		inductionGroup : seq of InductionController := [];
+		inv len inductionGroup = NumOfInductions; 
+		inv forall x,y in set elems inductionGroup &
+			x <> y => x.GetId() <> y.GetId();
 		sorterRing : inmap Tray`UID to Tray;
 		inv card dom sorterRing = NumOfTrays;
 		
@@ -28,6 +31,7 @@ class TrayAllocator
 	public TrayStep: Tray`UID * Tray`State  ==> ()
 	TrayStep(uid, state) ==
 	(
+	   -- Not yet finished
 		for all i in set {1,...,NumOfInductions} 
 		do 
 		   inductionGroup(i).TrayStep();
@@ -47,6 +51,12 @@ class TrayAllocator
 		is not yet specified;
 		
 	functions
+	--public CalculateThroughput: set of Tray 
+	/*
+	to be calculated as:  sum of simulation time steps = number of steps * Tray`TraySize/SorterEnviroment`Speed
+    calculate the number of items inducted = number of tray stus equal <full> - sum of two tray items divied by 2
+    needs to be converted to items/hour 
+	*/
 
 	sync
 

@@ -19,7 +19,11 @@ class InductionController
 		allocator := a;
 		id := n;
 	);
-
+	
+	public GetId: () ==> nat
+	GetId() == 
+		return id;
+	
     -- Enviroment feeds a new item on induction
 	public FeedItem: Item ==> ()
 	FeedItem(i) ==
@@ -29,6 +33,7 @@ class InductionController
 	public TrayStep: () ==> ()
 	TrayStep() ==
 	(
+		IO`print("IC Time step\n");
 	);
 
 	functions
