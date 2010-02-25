@@ -6,9 +6,9 @@ class InductionController
 
 	instance variables
 		priority : nat := 0;		-- priotity of induction, incremented each time wait to induct item
-		id : nat;					-- Induction ID
+		id : nat;					-- Induction ID - not used yet !!!
 		allocator : TrayAllocator; 	-- TrayAllocator
-		items : set of Item := {};	-- set of items ready to be inducted
+		items : seq of Item := [];	-- set of items ready to be inducted
 	
 	operations
 
@@ -23,17 +23,38 @@ class InductionController
 	public GetId: () ==> nat
 	GetId() == 
 		return id;
+		
+	public GetPriority: () ==> nat
+	GetPriority() == 
+		return priority;
 	
     -- Enviroment feeds a new item on induction
 	public FeedItem: Item ==> ()
 	FeedItem(i) ==
-		items := items union {i};
+		items := items ^ [i];
 
     -- Simulate sorter-ring moved one tray step
 	public TrayStep: () ==> ()
 	TrayStep() ==
 	(
 		IO`print("IC Time step\n");
+		
+		-- It any items on induction then induct next item
+		-- If next item could be inducted then removed it from the head of sequence
+		-- If item could not be inducted then increment priority
+		let item = hd items, 
+		    n = len items  
+		in
+			if n > 0
+			then
+			  if allocator.InductItem(self, item)
+			  then
+			    (
+			    	items := tl items;
+			    	priority := 0
+			    )
+			  else 
+			    priority := priority + 1; -- Increment priority wait counter			  		
 	);
 
 	functions
