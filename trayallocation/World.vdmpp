@@ -4,6 +4,7 @@ class World
 	values
 
 	instance variables
+		--env : [SorterEnviroment] := nil;
 		env : SorterEnviroment;
 		timeSteps : set of nat := {1,...,50};
 
@@ -20,7 +21,10 @@ class World
 	(
 		for all t in set timeSteps 
 		do 
-			env.TimeStep(t);	 
+		(
+			env.TimeStep(t);
+			IO`print("Time step\n");
+		);
 	);
 
 	functions

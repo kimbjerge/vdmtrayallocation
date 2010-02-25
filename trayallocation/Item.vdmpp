@@ -7,18 +7,24 @@ class Item
 
 	instance variables
 	    id : nat;	   		-- Item ID 
-	    sizeOfTrays : nat;  -- Number of trays item occupies
+	    size : nat1;		-- Item size in mm
+	    sizeOfTrays : nat1;  -- Number of trays item occupies
 	    trays : set of Tray := {};  
 
 	operations
 	
     -- InductionController constructor
-	public Item: nat * nat ==> Item
-	Item(i, size) ==
+	public Item: nat * nat1 ==> Item
+	Item(i, s) ==
 	(
 		id := i;
-	    sizeOfTrays := size;
+		size := s;
+	    sizeOfTrays := size div Tray`TraySize + 1;
 	);
+	
+	public GetId: () ==> nat
+	GetId() == 
+		return id;
 	
 	public RemoveItem: () ==> ()
 	RemoveItem() ==
