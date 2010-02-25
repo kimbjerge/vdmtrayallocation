@@ -6,22 +6,30 @@ class Item
 		public ItemMinSize : nat = 100;   -- Item minimum size in mm
 
 	instance variables
-	    id : nat;	   		-- Item ID 
-	    size : nat1;		-- Item size in mm
+	    id : nat;	   		 -- Item ID for induction
+	    size : nat1;		 -- Item size in mm
+	    inv size >= ItemMinSize and size <= ItemMaxSize;
+	    
 	    sizeOfTrays : nat1;  -- Number of trays item occupies
-	    trays : set of Tray := {};  
-
+	    trays : set of Tray := {};
+	    
+	    -- If the item is on the sorter ring the size of trays the item occupies 
+	    -- must be equal to number of tray associations
+	    inv let t = card trays
+	        in t > 0 => sizeOfTrays = t;
+	      
 	operations
 	
     -- InductionController constructor
-	public Item: nat * nat1 ==> Item
-	Item(i, s) ==
+	public Item: nat1 * nat ==> Item
+	Item(s, i) ==
 	(
 		id := i;
 		size := s;
 	    sizeOfTrays := size div Tray`TraySize + 1;
 	);
 	
+	-- Return item id
 	public GetId: () ==> nat
 	GetId() == 
 		return id;
@@ -30,6 +38,7 @@ class Item
 	RemoveItem() ==
 		is not yet specified;
 	
+	-- Creates association between item and tray
 	public AssignItemToTray: Tray ==> ()
 	AssignItemToTray(tray) ==
 		trays := trays union {tray};

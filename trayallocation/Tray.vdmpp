@@ -8,22 +8,45 @@ class Tray
 		public TraySize    : nat1 = 800    -- Size of any tray 
 
 	instance variables
-		public state : State := <Empty>;
-		public item : [Item] := nil;
+	    
+		-- It is allowed for a tray to be <Full> with no item associated 
+		-- in this case an unknown item is detected by the card reader
+		state : State := <Empty>;
+		item : [Item] := nil;
+		-- If an items is associated with the tray state must be <Full>
+		inv item <> nil => state = <Full>;
 
 	operations
 
+    -- Returns true if tray is empty
 	public IsTrayEmpty: () ==> bool
 	IsTrayEmpty () ==
 		return state = <Empty>;
+	
+	-- Set state of tray	
+	public SetState: State ==> ()
+	SetState (s) ==
+	(
+		state := s;
+		if state = <Empty> 
+		then -- Remove item if tray is empty
+			item := nil;
+	);
+	
+	-- Returns <empty> or <full> state of tray	
+	public GetState: () ==> State
+	GetState () ==
+		return state;
 
+    -- Puts an item on the tray and assign association between tray and item 
 	public ItemOnTray: Item ==> ()
 	ItemOnTray (i) ==
 	(
-		state := <Full>;
+		SetState(<Full>);
 		item := i;
 		item.AssignItemToTray(self);
-	);
+	)
+	pre state = <Empty> and item = nil;
 		
 	functions
 

@@ -8,14 +8,18 @@ class TrayAllocator
 
 	instance variables
 		currThroughput : nat := 0;
+		
+		-- Induction group and invariants 
 		inductionGroup : seq of InductionController := [];
 		inv len inductionGroup = NumOfInductions; 
 		inv forall x,y in set elems inductionGroup &
 			x <> y => x.GetId() <> y.GetId();
+			
+		-- Sorter ring and invariants	
 		sorterRing : inmap Tray`UID to Tray;
 		inv card dom sorterRing = NumOfTrays;
+		trayAtCardReader : Tray`UID := 0;
 		
-
 	operations
 	
     -- TrayAllocator constructor
@@ -31,20 +35,26 @@ class TrayAllocator
 	public TrayStep: Tray`UID * Tray`State  ==> ()
 	TrayStep(uid, state) ==
 	(
-	   -- Not yet finished
-		for all i in set {1,...,NumOfInductions} 
+	   	-- Update current tray at card reader
+	    trayAtCardReader := uid;
+	    sorterRing(trayAtCardReader).SetState(state);
+	 	for all i in set {1,...,NumOfInductions} 
 		do 
 		   inductionGroup(i).TrayStep();
-	);
+	)
+	pre uid in set dom sorterRing;
 	
 	public InductItem: InductionController * Item ==> bool
 	InductItem(ic, item) ==
-		is not yet specified;
+	(
+		return false;	
+	)
+	pre ic in set elems inductionGroup;
 	
 	-- Returns true if sorter is full
 	public IsSorterFull: () ==> bool
 	IsSorterFull() ==
-	 return forall id in set dom sorterRing & sorterRing(id).state = <Full>;
+	 return forall id in set dom sorterRing & sorterRing(id).GetState() = <Full>;
 
 	private AllocateTray: () ==> bool
 	AllocateTray() ==
