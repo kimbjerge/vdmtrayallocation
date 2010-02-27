@@ -5,11 +5,14 @@ class TrayAllocator
 	types
 
 	values
-		public InductionSeperation: nat = 3;
+		public InductionSeperation: nat = 4;
 		public NumOfInductions : nat = 4;
-		public NumOfTrays : nat = 20
+		public NumOfTrays : nat = 20;
 
 	instance variables
+		-- Ensure sufficient number of trays on sortering based on inductions and seperation
+		inv NumOfTrays >= InductionSeperation * NumOfInductions; 
+
 		currThroughput : nat := 0;
 		countTraySteps : nat := 0;  -- Used for calculation of throughput
 		
@@ -44,7 +47,10 @@ class TrayAllocator
 	(
 	   	-- Update current tray at card reader
 	    trayAtCardReader := uid;
-	    sorterRing(trayAtCardReader).SetState(state);
+	    
+	    -- Simulate change of Tray state !!!
+	    -- sorterRing(trayAtCardReader).SetState(state);
+	 	
 	 	for all i in set {1,...,NumOfInductions} 
 		do 
 		   inductionGroup(i).TrayStep();
@@ -63,7 +69,7 @@ class TrayAllocator
 		 	return false
 		else
 			let numTrays = item.GetSizeOfTrays(),
-				trays = AllocateTray(numTrays)
+				trays = AllocateTray(ic.GetId(), numTrays)
 			in 
 			    if trays <> {}
 			    then return PutItemOnTrays(item, trays)
@@ -84,11 +90,13 @@ class TrayAllocator
 
     -- Returns set of empty trays at trayAtCardReader
     -- Not yet completed !!! - currently only looking for one Tray and ignoring size
-	private AllocateTray: nat1 ==> set of Tray
-	AllocateTray(size) ==
-		if sorterRing(trayAtCardReader).IsTrayEmpty()
-		then return {sorterRing(trayAtCardReader)}
-		else return {};
+	private AllocateTray: nat * nat1 ==> set of Tray
+	AllocateTray(icid, size) ==
+		let posTray = InductionOffset(trayAtCardReader, icid)
+		in 
+			if sorterRing(posTray).IsTrayEmpty()
+			then return {sorterRing(posTray)}
+			else return {};
 	
 	-- Assign item on empty trays 
 	private PutItemOnTrays: Item * set of Tray ==> bool
@@ -120,7 +128,9 @@ class TrayAllocator
 			card traysWithItems - (card traysWith2Items/2)
 	pre trays <> {};
 	
-	
+	private InductionOffset: Tray`UID * nat -> Tray`UID
+	InductionOffset(trayAtCardReader, icid) ==
+		((trayAtCardReader + icid*InductionSeperation) mod NumOfTrays) + 1;
 
 
 	sync
