@@ -6,7 +6,7 @@ class World
 	instance variables
 		--env : [SorterEnviroment] := nil;
 		env : SorterEnviroment;
-		timeSteps : set of nat := {0,...,22};
+		timeSteps : set of nat := {0,...,30};
 
 	operations
 	
