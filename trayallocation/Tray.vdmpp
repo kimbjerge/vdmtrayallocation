@@ -1,11 +1,14 @@
+-- Tray in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+
 class Tray
 	types
 		public State = <Empty> | <Full>;
 	    public UID = nat
-	    inv u == u <= TrayAllocator`NumOfTrays;
+	    inv u == u <= TrayAllocator`NumOfTrays;  	-- Limitation on UID 
 
 	values
-		public TraySize    : nat1 = 800    -- Size of any tray 
+		public TraySize    : nat1 = 800    			-- Size of any tray 
 
 	instance variables
 	    
@@ -13,7 +16,7 @@ class Tray
 		-- in this case an unknown item is detected by the card reader
 		state : State := <Empty>;
 		item : [Item] := nil;
-		-- If an items is associated with the tray state must be <Full>
+		-- If an item is associated with a tray the state must be <Full>
 		inv item <> nil => state = <Full>;
 
 	operations
@@ -22,29 +25,41 @@ class Tray
 	public IsTrayEmpty: () ==> bool
 	IsTrayEmpty () ==
 		return state = <Empty>;
+
+    -- Returns true if tray is full
+	public IsTrayFull: () ==> bool
+	IsTrayFull () ==
+		return state = <Full>;
 	
+	-- Returns item on tray
+	public GetItem: () ==> [Item]
+	GetItem () ==
+		return item;
+		
 	-- Set state of tray	
 	public SetState: State ==> ()
 	SetState (s) ==
 	(
-		state := s;
-		if state = <Empty> 
+		if s = <Empty> 
 		then -- Remove item if tray is empty
 			item := nil;
+		state := s;
 	);
 	
-	-- Returns <empty> or <full> state of tray	
+	-- Returns state of tray ==> <empty> or <full>	
 	public GetState: () ==> State
 	GetState () ==
 		return state;
 
-    -- Puts an item on the tray and assign association between tray and item 
-	public ItemOnTray: Item ==> ()
+    -- Puts an item on the tray and creates association between tray and item 
+	public ItemOnTray: Item ==> bool
 	ItemOnTray (i) ==
 	(
 		SetState(<Full>);
 		item := i;
 		item.AssignItemToTray(self);
+		IO`print("Item on tray\n");
+		return true;
 	)
 	pre state = <Empty> and item = nil;
 		

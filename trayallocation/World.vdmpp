@@ -6,7 +6,7 @@ class World
 	instance variables
 		--env : [SorterEnviroment] := nil;
 		env : SorterEnviroment;
-		timeSteps : set of nat := {1,...,50};
+		timeSteps : set of nat := {0,...,22};
 
 	operations
 	
@@ -16,15 +16,16 @@ class World
 		env := new SorterEnviroment();
 	);
 
-	public Run: () ==> ()
+	public Run: () ==> nat
 	Run() ==
 	(
 		for all t in set timeSteps 
 		do 
 		(
 			env.TimeStep(t);
-			IO`print("Time step\n");
+			-- IO`print("Time step\n");
 		);
+		return env.sc.allocator.GetThroughput();
 	);
 
 	functions
