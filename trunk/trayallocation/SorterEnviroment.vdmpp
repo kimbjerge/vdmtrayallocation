@@ -6,7 +6,7 @@ class SorterEnviroment
 		public Throughput  : nat = 10000; -- Required items/hour
 
 	instance variables
-		sc : SC;
+		public sc : SC;
 		inductionGroup : seq of InductionController := [];
 		item : Item;
 
@@ -39,7 +39,7 @@ class SorterEnviroment
 		);
 
     	-- Enviroment simulate sorter moved one tray step
-		sc.TrayStep(t mod TrayAllocator`NumOfTrays, <Empty>);
+		sc.TrayStep(t mod TrayAllocator`NumOfTrays + 1, <Empty>);
 	);
 		
 	functions

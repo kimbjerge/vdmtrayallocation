@@ -4,7 +4,7 @@ class SC
 	values
 		
 	instance variables
-		allocator : TrayAllocator;
+		public allocator : TrayAllocator;
 	
 	operations
 	
@@ -19,6 +19,7 @@ class SC
 	public TrayStep: Tray`UID * Tray`State  ==> ()
 	TrayStep(uid, state) ==
 	(
+		IO`print("Tray step\n");
 		allocator.TrayStep(uid, state);
 	);
 

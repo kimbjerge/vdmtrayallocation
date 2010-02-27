@@ -1,14 +1,18 @@
+-- InductionController in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+
 class InductionController
 	types
 
 	values
-		public InductionRate : nat = 3;    -- trays between each item
+		public InductionRate : nat = 4;    	-- trays between each item
 
 	instance variables
-		priority : nat := 0;		-- priotity of induction, incremented each time wait to induct item
-		id : nat;					-- Induction ID - not used yet !!!
-		allocator : TrayAllocator; 	-- TrayAllocator
-		items : seq of Item := [];	-- set of items ready to be inducted
+		priority : nat := 0;				-- priotity of induction, incremented each time wait to induct item
+		id : nat1;							-- Induction ID 
+		allocator : TrayAllocator; 			-- TrayAllocator
+		items : seq of Item := [];			-- set of items ready to be inducted
+		stepCount: nat := 0; 				-- Counts the number of steps between inducting items
 	
 	operations
 
@@ -20,13 +24,28 @@ class InductionController
 		id := n;
 	);
 	
+	-- Returns induction controller UID
 	public GetId: () ==> nat
 	GetId() == 
 		return id;
-		
+	
+	-- Returns priority of induction controller	
 	public GetPriority: () ==> nat
 	GetPriority() == 
 		return priority;
+	
+	-- Returns true if induction is wating with an item
+	public IsItemWaiting: () ==> bool
+	IsItemWaiting() ==
+		return priority > 0;
+		
+	-- Get size of waiting item in number of trays
+	public GetSizeOfWaitingItem: () ==> nat
+	GetSizeOfWaitingItem() ==
+		let item = hd items
+			in item.GetSizeOfTrays()
+	pre priority > 0 and len items > 0;
+		  	
 	
     -- Enviroment feeds a new item on induction
 	public FeedItem: Item ==> ()
@@ -37,11 +56,23 @@ class InductionController
 	public TrayStep: () ==> ()
 	TrayStep() ==
 	(
-		IO`print("IC Time step\n");
+		--IO`print("IC Time step\n");
 		
-		-- It any items on induction then induct next item
-		-- If next item could be inducted then removed it from the head of sequence
-		-- If item could not be inducted then increment priority
+		-- Induct next item based on InductionRate
+		stepCount := stepCount + 1;
+		if IsItemWaiting() or (stepCount >= InductionRate)
+		then
+		(
+			InductNextItem();
+			stepCount := 0;
+		)
+	);
+
+	-- It any items on induction then induct next item
+	-- If next item could be inducted then removed it from the head of item sequence
+	-- If item could not be inducted then increment priority
+    private InductNextItem: () ==> ()
+    InductNextItem() ==
 		let item = hd items, 
 		    n = len items  
 		in
@@ -55,8 +86,7 @@ class InductionController
 			    )
 			  else 
 			    priority := priority + 1; -- Increment priority wait counter			  		
-	);
-
+    
 	functions
 
 	sync

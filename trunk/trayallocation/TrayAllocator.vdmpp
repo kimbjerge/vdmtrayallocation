@@ -1,13 +1,17 @@
+-- TrayAllocator in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+
 class TrayAllocator
 	types
 
 	values
 		public InductionSeperation: nat = 3;
-		public NumOfInductions : nat = 5;
+		public NumOfInductions : nat = 4;
 		public NumOfTrays : nat = 20
 
 	instance variables
 		currThroughput : nat := 0;
+		countTraySteps : nat := 0;  -- Used for calculation of throughput
 		
 		-- Induction group and invariants 
 		inductionGroup : seq of InductionController := [];
@@ -18,7 +22,10 @@ class TrayAllocator
 		-- Sorter ring and invariants	
 		sorterRing : inmap Tray`UID to Tray;
 		inv card dom sorterRing = NumOfTrays;
+		
+		-- Tray at card reader and invariants
 		trayAtCardReader : Tray`UID := 0;
+		inv trayAtCardReader > 0 => trayAtCardReader in set dom sorterRing;
 		
 	operations
 	
@@ -41,32 +48,80 @@ class TrayAllocator
 	 	for all i in set {1,...,NumOfInductions} 
 		do 
 		   inductionGroup(i).TrayStep();
+		   
+		-- Count the number of tray steps 
+		countTraySteps := countTraySteps + 1;
 	)
 	pre uid in set dom sorterRing;
 	
+	-- Inducting item on sorter if empty trays and no higher induction priority
 	public InductItem: InductionController * Item ==> bool
 	InductItem(ic, item) ==
 	(
-		return false;	
+		if InductionsWithHigherPriority(ic)
+		then
+		 	return false
+		else
+			let numTrays = item.GetSizeOfTrays(),
+				trays = AllocateTray(numTrays)
+			in 
+			    if trays <> {}
+			    then return PutItemOnTrays(item, trays)
+			    else return false;
 	)
 	pre ic in set elems inductionGroup;
 	
 	-- Returns true if sorter is full
 	public IsSorterFull: () ==> bool
 	IsSorterFull() ==
-	 return forall id in set dom sorterRing & sorterRing(id).GetState() = <Full>;
+	 	return forall id in set dom sorterRing & sorterRing(id).GetState() = <Full>;
 
-	private AllocateTray: () ==> bool
-	AllocateTray() ==
-		is not yet specified;
+    -- Returns true if no higher priority of inductions in front of this induction
+	private InductionsWithHigherPriority: InductionController ==> bool
+	InductionsWithHigherPriority(ic) ==
+		return exists i in set elems inductionGroup & i.GetId() > ic.GetId() and i.GetPriority() > ic.GetPriority()
+	pre ic in set elems inductionGroup;
+
+    -- Returns set of empty trays at trayAtCardReader
+    -- Not yet completed !!! - currently only looking for one Tray and ignoring size
+	private AllocateTray: nat1 ==> set of Tray
+	AllocateTray(size) ==
+		if sorterRing(trayAtCardReader).IsTrayEmpty()
+		then return {sorterRing(trayAtCardReader)}
+		else return {};
+	
+	-- Assign item on empty trays 
+	private PutItemOnTrays: Item * set of Tray ==> bool
+	PutItemOnTrays(item, trays) ==
+		for all t in set trays
+		do
+			t.ItemOnTray(item)
+	pre trays <> {} and forall t in set trays & t.IsTrayEmpty();
+	
+	-- Returns calculated throughput of soter capacity for current state of sorter ring
+	public GetThroughput: () ==> nat
+	GetThroughput () ==
+		CalculateThroughput(countTraySteps, rng sorterRing);
 		
 	functions
-	--public CalculateThroughput: set of Tray 
+
+	-- Calculates the current throughput based on items on sorter ring 
 	/*
 	to be calculated as:  sum of simulation time steps = number of steps * Tray`TraySize/SorterEnviroment`Speed
-    calculate the number of items inducted = number of tray stus equal <full> - sum of two tray items divied by 2
+    calculate the number of items inducted = number of tray with status equal <full> - sum of two tray items divied by 2
     needs to be converted to items/hour 
 	*/
+	private CalculateThroughput: nat * set of Tray -> nat
+	CalculateThroughput(steps, trays) ==
+		let time :real = steps * (Tray`TraySize/SorterEnviroment`Speed),
+			traysWithItems = {twi | twi in set trays & twi.IsTrayFull()},
+			traysWith2Items = {tw2i | tw2i in set traysWithItems & tw2i.GetItem() <> nil and tw2i.GetItem().GetSizeOfTrays() = 2}
+		in 
+			card traysWithItems - (card traysWith2Items/2)
+	pre trays <> {};
+	
+	
+
 
 	sync
 

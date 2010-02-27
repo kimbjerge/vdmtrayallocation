@@ -1,3 +1,6 @@
+-- Item in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+
 class Item
 	types
 
@@ -24,9 +27,9 @@ class Item
 	public Item: nat1 * nat ==> Item
 	Item(s, i) ==
 	(
-		id := i;
 		size := s;
 	    sizeOfTrays := size div Tray`TraySize + 1;
+		id := i;
 	);
 	
 	-- Return item id
@@ -34,15 +37,21 @@ class Item
 	GetId() == 
 		return id;
 	
-	public RemoveItem: () ==> ()
-	RemoveItem() ==
-		is not yet specified;
-	
+	-- Returns the number of trays the item occupies
+	public GetSizeOfTrays: () ==> nat1
+	GetSizeOfTrays() ==
+		return sizeOfTrays;
+
 	-- Creates association between item and tray
 	public AssignItemToTray: Tray ==> ()
 	AssignItemToTray(tray) ==
 		trays := trays union {tray};
-			
+
+	-- Remove item from sorter ring - Implicit operation - not used yet !!!
+	public RemoveItemFromTray ()
+	ext wr trays : set of Tray
+	post trays = {}; 
+				
 	functions
 
 	sync
