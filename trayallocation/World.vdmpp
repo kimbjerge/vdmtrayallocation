@@ -1,3 +1,6 @@
+-- World in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+
 class World
 	types
 

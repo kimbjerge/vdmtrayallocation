@@ -1,15 +1,42 @@
+-- SorterEnvironment in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+
 class SorterEnviroment
 	types
+
+	-- 1 Declare a sequence of elements inlines
+	InputTP   = (int * seq1 of inline);
+	-- 2 InputTP = (seq1 of inline);
+
+	-- inline elements are composed by 3 integers.
+	inline  = int * int * int;
+
 
 	values
 		public Speed	   : nat = 2000;  -- Sorter speed mm/sec
 		public Throughput  : nat = 10000; -- Required items/hour
+		
+		-- Input file name
+		logfilename : seq1 of char ="test.txt";
+		
 
 	instance variables
 		public sc : SC;
 		inductionGroup : seq of InductionController := [];
 		item : Item;
+		
+		-- Create a new IO instance
+		io : IO := new IO();
+		-- Create a buffer to store file readings
+		inlines  : seq of inline  := [];
 
+		-- Store the write result operation on a boolean variable
+		fileResult :bool;
+		
+		timeIn : int;
+		itemIn : int;
+		sizeIn : int;
+		
 	operations
 	
     -- SorterEnviroment constructor
@@ -32,6 +59,28 @@ class SorterEnviroment
 	(
 		-- Enviroment simulate feeding inductions with items
 		-- Use input from a simulation file
+		
+		-- An example that writes Hello from vdm++ on a file.
+		-- May be useful later.
+		-- fileResult := io.fecho(logfilename,"Hello from vdm++",<append>);
+	
+		-- 1 With this sentence I try to read from file a record, that contains
+		-- time and several records with the structure (induction, item size)
+		-- The function reads the data type InputTP from the file referenced by logfilename
+		-- the returned value will be stored at the record mk_(timeIn,mk_(itemIn,sizeIn))
+		def mk_(timeIn,mk_(itemIn,sizeIn))= io.freadval[InputTP](logfilename)
+		in
+		(
+			-- Here we are supposed to make the assignments, mapping the read values from
+			-- the file to our local program variables.
+		);
+		
+		-- This second case it is not being used, since it is not syntactically correct
+		-- but I think it is the most convinient to store the data (It is the one that we
+		-- discussed as well past thursday).
+		-- 2 def mk_(timeIn,itemIn,sizeIn)= io.freadval[InputTP](logfilename)
+		
+
 		for i = 1 to len inductionGroup do
 		(
 		  item := new Item(500, t+i);
@@ -41,7 +90,9 @@ class SorterEnviroment
     	-- Enviroment simulate sorter moved one tray step
 		sc.TrayStep(t mod TrayAllocator`NumOfTrays + 1, <Empty>);
 	);
-		
+	
+	
+
 	functions
 
 	sync
