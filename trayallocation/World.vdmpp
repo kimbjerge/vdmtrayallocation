@@ -9,7 +9,8 @@ class World
 	instance variables
 		--env : [SorterEnviroment] := nil;
 		env : SorterEnviroment;
-		timeSteps : set of nat := {0,...,30};
+		timeSteps : set of nat := {0,...,20};
+		sorterFull : bool := false;
 
 	operations
 	
@@ -19,7 +20,7 @@ class World
 		env := new SorterEnviroment();
 	);
 
-	public Run: () ==> nat
+	public Run: () ==> nat * nat * nat * nat * real
 	Run() ==
 	(
 		for all t in set timeSteps 
@@ -28,6 +29,7 @@ class World
 			env.TimeStep(t);
 			-- IO`print("Time step\n");
 		);
+		sorterFull := env.sc.allocator.IsSorterFull();
 		return env.sc.allocator.GetThroughput();
 	);
 
