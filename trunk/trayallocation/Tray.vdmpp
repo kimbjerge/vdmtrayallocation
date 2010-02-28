@@ -8,7 +8,7 @@ class Tray
 	    inv u == u <= TrayAllocator`NumOfTrays;  	-- Limitation on UID 
 
 	values
-		public TraySize    : nat1 = 800    			-- Size of any tray 
+		public TraySize    : nat1 = 600    			-- Size of any tray mm 
 
 	instance variables
 	    
@@ -18,8 +18,17 @@ class Tray
 		item : [Item] := nil;
 		-- If an item is associated with a tray the state must be <Full>
 		inv item <> nil => state = <Full>;
+		
+		id : UID;									 -- Tray UID
 
 	operations
+
+    -- Tray constructor
+	public Tray: UID ==> Tray
+	Tray(i) ==
+	(
+		id := i;
+	);
 
     -- Returns true if tray is empty
 	public IsTrayEmpty: () ==> bool
@@ -55,10 +64,17 @@ class Tray
 	public ItemOnTray: Item ==> bool
 	ItemOnTray (i) ==
 	(
-		SetState(<Full>);
-		item := i;
+		atomic -- Only needed if item is assigned before state
+		(
+			item := i;
+			state := <Full>;
+		);
 		item.AssignItemToTray(self);
-		IO`print("Item on tray\n");
+		
+		IO`print("Item id " ^ String`NatToStr(item.GetId()) ^ 
+		         "size " ^ String`NatToStr(item.GetSize()) ^ 
+		         "on tray id " ^ String`NatToStr(id) ^ "\n");
+		
 		return true;
 	)
 	pre state = <Empty> and item = nil;

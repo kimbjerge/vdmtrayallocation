@@ -1,0 +1,27 @@
+-- AllocatorOneTray in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+-- (strategy pattern)
+
+class AllocatorOneTray is subclass of AllocatorStrategy
+
+	operations
+	
+	    -- AllocatorOneTray constructor
+		public AllocatorOneTray: TrayAllocator==> AllocatorOneTray
+		AllocatorOneTray(ta) ==
+		(
+			trayAllocator := ta;
+		);
+		
+		-- Allocates tray if empty at induction offset
+		public AllocateTray: nat ==> set of Tray
+		AllocateTray (icid) ==
+			def posTray = InductionOffset(trayAllocator.trayAtCardReader, icid)
+			in 
+				if trayAllocator.sorterRing(posTray).IsTrayEmpty()
+				then return {trayAllocator.sorterRing(posTray)}
+				else return {}
+		pre icid in set inds trayAllocator.inductionGroup;
+
+
+end AllocatorOneTray

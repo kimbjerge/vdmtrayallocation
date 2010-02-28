@@ -3,17 +3,20 @@
 
 class Item
 	types
+	    public ItemTraySize = nat1
+	    inv it == it <= ItemMaxTrays;  	  -- Limitation on how many trays an item occupies 
 
 	values
 		public ItemMaxSize : nat = 1500;  -- Item maximum size in mm
 		public ItemMinSize : nat = 100;   -- Item minimum size in mm
+		public ItemMaxTrays: nat = 2;	  -- Maimum number of trays an item occupies
 
 	instance variables
-	    id : nat;	   		 -- Item ID for induction
-	    size : nat1;		 -- Item size in mm
+	    id : nat;	   		 			  -- Item ID for induction
+	    size : nat1;		 			  -- Item size in mm
 	    inv size >= ItemMinSize and size <= ItemMaxSize;
 	    
-	    sizeOfTrays : nat1;  -- Number of trays item occupies
+	    sizeOfTrays : ItemTraySize; 	  -- Number of trays item occupies
 	    trays : set of Tray := {};
 	    
 	    -- If the item is on the sorter ring the size of trays the item occupies 
@@ -28,7 +31,7 @@ class Item
 	Item(s, i) ==
 	(
 		size := s;
-	    sizeOfTrays := size div Tray`TraySize + 1;
+    	sizeOfTrays := size div Tray`TraySize + 1;
 		id := i;
 	);
 	
@@ -38,9 +41,14 @@ class Item
 		return id;
 	
 	-- Returns the number of trays the item occupies
-	public GetSizeOfTrays: () ==> nat1
+	public GetSizeOfTrays: () ==> ItemTraySize
 	GetSizeOfTrays() ==
 		return sizeOfTrays;
+
+	-- Return item size
+	public GetSize: () ==> nat
+	GetSize() == 
+		return size;
 
 	-- Creates association between item and tray
 	public AssignItemToTray: Tray ==> ()

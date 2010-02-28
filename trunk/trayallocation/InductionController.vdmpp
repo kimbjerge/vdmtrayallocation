@@ -5,7 +5,7 @@ class InductionController
 	types
 
 	values
-		public InductionRate : nat = 4;    	-- trays between each item
+		public InductionRate : nat = 2;    	-- trays between each item
 
 	instance variables
 		priority : nat := 0;				-- priotity of induction, incremented each time wait to induct item
