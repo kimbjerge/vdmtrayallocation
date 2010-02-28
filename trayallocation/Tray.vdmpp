@@ -70,7 +70,8 @@ class Tray
 			state := <Full>;
 		);
 		item.AssignItemToTray(self);
-		
+
+		-- ??? comment out during traces in TestSenarious
 		IO`print("Item id " ^ String`NatToStr(item.GetId()) ^ 
 		         "size " ^ String`NatToStr(item.GetSize()) ^ 
 		         "on tray id " ^ String`NatToStr(id) ^ "\n");

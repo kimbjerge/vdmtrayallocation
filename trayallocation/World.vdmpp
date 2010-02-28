@@ -8,7 +8,7 @@ class World
 
 	instance variables
 		--env : [SorterEnviroment] := nil;
-		env : SorterEnviroment;
+		public env : SorterEnviroment;
 		timeSteps : set of nat := {0,...,20};
 		sorterFull : bool := false;
 
