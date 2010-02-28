@@ -1,0 +1,86 @@
+class TestSenarios
+	types
+
+	values
+
+	instance variables
+
+		item1  : Item := new Item(100,   1);
+		item2  : Item := new Item(200,   2);
+		item3  : Item := new Item(300,   3);
+		item4  : Item := new Item(400,   4);
+		item5  : Item := new Item(500,   5);
+		item6  : Item := new Item(600,   6);
+		item7  : Item := new Item(700,   7);
+		item8  : Item := new Item(800,   8);
+		item9  : Item := new Item(900,   9);
+		item10 : Item := new Item(1000, 10);
+		item11 : Item := new Item(100,  11);
+		item12 : Item := new Item(200,  12);
+		item13 : Item := new Item(300,  13);
+		item14 : Item := new Item(400,  14);
+		item15 : Item := new Item(500,  15);
+		item16 : Item := new Item(600,  16);
+		item17 : Item := new Item(700,  17);
+		item18 : Item := new Item(800,  18);
+		item19 : Item := new Item(900,  19);
+		item20 : Item := new Item(1000, 20);
+		
+		items1 : set of Item := {item1,
+								 item2,
+								 item3,
+								 item4,
+								 item5,
+								 item6,
+								 item7,
+								 item8,
+								 item9,
+								 item10
+								};
+
+		items2 : set of Item := {item1,
+								 item2,
+								 item3,
+								 item4,
+								 item5,
+								 item6,
+								 item7,
+								 item8,
+								 item9,
+								 item10,
+								 item11,
+								 item12,
+								 item13,
+								 item14,
+								 item15,
+								 item16,
+								 item17,
+								 item18,
+								 item19,
+								 item20 
+								};
+								
+		env  : SorterEnviroment := new SorterEnviroment();
+
+	operations
+
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+  	TestSenario1: (
+  				  	let item in set items2
+  					in
+  						let ic in set {1,...,TrayAllocator`NumOfInductions}
+                     	in
+ 							env.FeedItemOnInduction(ic, item);
+				   	let step in set {1,...,20}
+				   	in
+				   		env.TimeStep(step)
+				   );
+
+end TestSenarios

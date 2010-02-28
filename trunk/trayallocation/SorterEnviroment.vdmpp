@@ -22,7 +22,7 @@ class SorterEnviroment
 
 	instance variables
 		public sc : SC;
-		inductionGroup : seq of InductionController := [];
+		public inductionGroup : seq of InductionController := [];
 		itemId : nat := 0;
 		
 		-- Create a new IO instance
@@ -52,6 +52,10 @@ class SorterEnviroment
 	(
 		inductionGroup := ig;
 	);
+	
+	public FeedItemOnInduction: nat * Item ==> ()
+	FeedItemOnInduction(ic, item) ==
+		  inductionGroup(ic).FeedItem(item);
 	
 	-- Called by world each time sorter ring moves one tray step 
 	public TimeStep: nat ==> ()
@@ -83,7 +87,10 @@ class SorterEnviroment
 		-- 2 def mk_(timeIn,itemIn,sizeIn)= io.freadval[InputTP](logfilename)
 		
 
-		for i = 1 to len inductionGroup do
+/* traces in TestSenarios ??? */
+		-- ??? comment out during traces in TestSenarious
+	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
+		do 
 		(
 		  itemId := itemId + 1;
    	  	  
@@ -97,6 +104,7 @@ class SorterEnviroment
 		  
 		  inductionGroup(i).FeedItem(item);
 		);
+/* traces in TestSenarios ??? */
 
  		-- Performs tray step for each induction
 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
@@ -116,5 +124,5 @@ class SorterEnviroment
 	--thread
 
 	traces
-
+	
 end SorterEnviroment
