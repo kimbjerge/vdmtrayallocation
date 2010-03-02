@@ -79,7 +79,8 @@ class TrayAllocator
 			    else
 			    ( 
 			    	countItemsInducted := countItemsInducted + 1;
-			    	return PutItemOnTrays(item, trays)
+			    	PutItemOnTrays(item, trays);
+			    	return true;
 			    ) 
 	)
 	pre ic in set elems inductionGroup;
@@ -111,9 +112,9 @@ class TrayAllocator
 	pre icid in set inds inductionGroup and size <= 2; -- To be changed if ItemMaxTrays is increased
 	
 	-- Assign item on empty trays 
-	private PutItemOnTrays: Item * set of Tray ==> bool
+	private PutItemOnTrays: Item * set of Tray ==> ()
 	PutItemOnTrays(item, trays) ==
-		for all t in set trays
+	 	for all t in set trays
 		do
 			t.ItemOnTray(item)
 	pre trays <> {} and forall t in set trays & t.IsTrayEmpty();
