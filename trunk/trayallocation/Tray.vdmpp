@@ -61,7 +61,7 @@ class Tray
 		return state;
 
     -- Puts an item on the tray and creates association between tray and item 
-	public ItemOnTray: Item ==> bool
+	public ItemOnTray: Item ==> ()
 	ItemOnTray (i) ==
 	(
 		atomic -- Only needed if item is assigned before state
@@ -75,8 +75,6 @@ class Tray
 		IO`print("Item id " ^ String`NatToStr(item.GetId()) ^ 
 		         "size " ^ String`NatToStr(item.GetSize()) ^ 
 		         "on tray id " ^ String`NatToStr(id) ^ "\n");
-		
-		return true;
 	)
 	pre state = <Empty> and item = nil;
 		
