@@ -9,9 +9,10 @@ class World
 	instance variables
 		--env : [SorterEnviroment] := nil;
 		public env : SorterEnviroment;
-		timeSteps : set of nat := {0,...,15};
 		sorterFull : bool := false;
-
+		loader : [ItemLoader] := nil;
+	    testfile : seq1 of char := "scenario.txt";
+	    
 	operations
 	
 	public World: () ==> World
@@ -23,7 +24,10 @@ class World
 	public Run: () ==> nat * nat * nat * nat * real
 	Run() ==
 	(
-		for all t in set timeSteps 
+		loader := new ItemLoader(testfile);
+		env.AssignItemLoader(loader);
+				
+		for all t in set {0,...,loader.GetNumTimeSteps()} 
 		do 
 		(
 			env.TimeStep(t);
