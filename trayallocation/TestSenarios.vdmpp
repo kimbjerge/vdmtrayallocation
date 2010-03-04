@@ -73,7 +73,7 @@ class TestSenarios
 	traces
 
   	TestSenario1: (
-  				  	let item in set items2
+  				  	let item in set items1
   					in
   						let ic in set {1,...,TrayAllocator`NumOfInductions}
                      	in

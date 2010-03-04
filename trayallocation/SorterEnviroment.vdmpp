@@ -106,13 +106,14 @@ class SorterEnviroment
 		);
 /* traces in TestSenarios ??? */
 
+    	-- Enviroment simulate sorter moved one tray step
+		sc.TrayStep(t mod TrayAllocator`NumOfTrays + 1, <Empty>);
+
  		-- Performs tray step for each induction
 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do 
 		   inductionGroup(i).TrayStep();
 
-    	-- Enviroment simulate sorter moved one tray step
-		sc.TrayStep(t mod TrayAllocator`NumOfTrays + 1, <Empty>);
 	);
 	
 	

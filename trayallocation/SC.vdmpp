@@ -24,6 +24,7 @@ class SC
 	TrayStep(uid, state) ==
 	(
 		-- ??? comment out during traces in TestSenarious
+		-- 
 		IO`print("Card reader tray id " ^ String`NatToStr(uid) ^ "\n");
 		allocator.CardReader(uid, state);
 	);
