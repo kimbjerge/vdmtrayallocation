@@ -71,7 +71,8 @@ class TestSenarios
 	--thread
 
 	traces
-
+    
+    -- To run TestSenarious - IO`print has to be commented out
   	TestSenario1: (
   				  	let item in set items1
   					in

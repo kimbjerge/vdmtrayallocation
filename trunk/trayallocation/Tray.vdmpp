@@ -4,8 +4,8 @@
 class Tray
 	types
 		public State = <Empty> | <Full>;
-	    public UID = nat
-	    inv u == u <= TrayAllocator`NumOfTrays;  	-- Limitation on UID 
+	    public UID = nat;
+	    --inv u == u <= TrayAllocator`NumOfTrays;  	-- Limitation on UID 
 
 	values
 		public TraySize    : nat1 = 600    			-- Size of any tray mm 
@@ -72,7 +72,7 @@ class Tray
 		item.AssignItemToTray(self);
 
 		-- ??? comment out during traces in TestSenarious
-		IO`print("Item id " ^ String`NatToStr(item.GetId()) ^ 
+		IO`print("-> Item id " ^ String`NatToStr(item.GetId()) ^ 
 		         "size " ^ String`NatToStr(item.GetSize()) ^ 
 		         "on tray id " ^ String`NatToStr(id) ^ "\n");
 	)

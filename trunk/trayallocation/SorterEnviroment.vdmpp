@@ -38,6 +38,7 @@ class SorterEnviroment
 		inductionGroup := ig;
 	);
 	
+	-- Used by traces in TestSernarios
 	public FeedItemOnInduction: nat * Item ==> ()
 	FeedItemOnInduction(ic, item) ==
 		  inductionGroup(ic).FeedItem(item);
@@ -47,19 +48,19 @@ class SorterEnviroment
 	TimeStep(t) ==
 	(
 
-/* traces in TestSenarios ??? */
 		-- ??? comment out during traces in TestSenarious
 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do 
 		(
-			dcl item : [Item];	
-			item := itemLoader.GetItemAtTimeStep(t, i);
-			if (item <> nil)
-			then 
-			(
-			  	itemId := itemId + 1;
-			  	inductionGroup(i).FeedItem(item);
-			);
+			-- Check for item to feed induction at time step
+			let size = itemLoader.GetItemAtTimeStep(t, i)
+			in
+				if (size > 0)
+				then 
+				(
+			  		itemId := itemId + 1;
+			  		inductionGroup(i).FeedItem(new Item(size, itemId));
+				);
  		);
 
     	-- Enviroment simulate sorter moved one tray step
@@ -73,7 +74,6 @@ class SorterEnviroment
 	);
 	
 	
-
 	functions
 
 	sync

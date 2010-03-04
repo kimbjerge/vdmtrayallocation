@@ -14,6 +14,7 @@ class AllocatorStrategy
 			
 	functions
 	
+	    -- Calculate current tray UID at position in front of induction based on position of card reader 
 		protected InductionOffset: Tray`UID * nat -> Tray`UID
 		InductionOffset(trayAtCardReader, icid) ==
 			((trayAtCardReader + icid*TrayAllocator`InductionSeperation) mod TrayAllocator`NumOfTrays) + 1;

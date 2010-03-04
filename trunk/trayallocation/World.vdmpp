@@ -7,34 +7,72 @@ class World
 	values
 
 	instance variables
-		--env : [SorterEnviroment] := nil;
-		public env : SorterEnviroment;
-		sorterFull : bool := false;
+		env : SorterEnviroment;
 		loader : [ItemLoader] := nil;
+		-- Test file that contains test scenarios - items to be feeded on inductions
 	    testfile : seq1 of char := "scenario.txt";
 	    
 	operations
 	
+   -- World constructor
 	public World: () ==> World
 	World() ==
 	(
 		env := new SorterEnviroment();
 	);
 
-	public Run: () ==> nat * nat * nat * nat * real
+    -- Prints configuration and result of tray allocation model simulation
+    public PrintSimulationResult: () ==> ()
+    PrintSimulationResult() ==
+    (
+		-- Prints configuration of simulation
+		IO`print("---------------------------------------------\n");
+		IO`print("Simulation completed for sorter configuration\n");
+		IO`print("---------------------------------------------\n");
+        IO`print("Specified throughput [items/hour]: " ^ String`NatToStr(SorterEnviroment`Throughput) ^ "\n");
+        IO`print("Sorter speed             [mm/sec]: " ^ String`NatToStr(SorterEnviroment`Speed) ^ "\n");
+        IO`print("Number of trays                  : " ^ String`NatToStr(TrayAllocator`NumOfTrays) ^ "\n");
+        IO`print("Number of inductions             : " ^ String`NatToStr(TrayAllocator`NumOfInductions) ^ "\n");
+        IO`print("Induction rate                   : " ^ String`NatToStr(InductionController`InductionRate) ^ "\n");
+        IO`print("Induction separation      [trays]: " ^ String`NatToStr(TrayAllocator`InductionSeperation) ^ "\n");
+		IO`print("----------------------------------------------\n");
+	
+		-- Prints result of simulation
+		let mk_(traysWithItems, twoTrayItemsOnSorter, traySteps, inductedItems, throughput) = env.sc.allocator.GetThroughput()
+		in
+		(
+			IO`print("Number of trays with items       : " ^ String`NatToStr(traysWithItems) ^ "\n");
+			IO`print("Two tray items on sorter         : " ^ String`NatToStr(twoTrayItemsOnSorter) ^ "\n");
+			IO`print("Number of tray steps             : " ^ String`NatToStr(traySteps) ^ "\n");
+			IO`print("Number of inducted items         : " ^ String`NatToStr(inductedItems) ^ "\n");
+			IO`print("Calculated throughput[items/hour]: " ^ String`NatToStr(floor(throughput)) ^ "\n");
+		);    
+
+		IO`print("----------------------------------------------\n");
+		if env.sc.allocator.IsSorterFull() = true
+		then
+			IO`print("      ****    Sorter is full   *****\n")
+	    else
+			IO`print("      ****  Sorter is not full  ****\n");
+		IO`print("----------------------------------------------\n");
+    );
+    
+	public Run: () ==> ()
 	Run() ==
 	(
 		loader := new ItemLoader(testfile);
 		env.AssignItemLoader(loader);
-				
+		
+		IO`print("---------------------------------------------\n");
+		IO`print("Tray allocation model : " ^ testfile ^ "\n");
+		IO`print("---------------------------------------------\n");
+		
+		-- Performs simulation based on time steps specified	
 		for all t in set {0,...,loader.GetNumTimeSteps()} 
 		do 
-		(
 			env.TimeStep(t);
-			-- IO`print("Time step\n");
-		);
-		sorterFull := env.sc.allocator.IsSorterFull();
-		return env.sc.allocator.GetThroughput();
+			
+		PrintSimulationResult();
 	);
 
 	functions

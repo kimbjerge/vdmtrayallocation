@@ -12,7 +12,7 @@ class TrayAllocator
 
 	instance variables
 		-- Ensure sufficient number of trays on sorter ring based on inductions and separation
-		inv NumOfTrays >= InductionSeperation * NumOfInductions; 
+		inv NumOfTrays > InductionSeperation * NumOfInductions; 
 
 		countTraySteps : nat := 0;  	-- Used for calculation of throughput
 		countItemsInducted : nat := 0;  -- Counts the number of items inducted 
@@ -20,8 +20,8 @@ class TrayAllocator
 		-- Induction group and invariants 
 		public inductionGroup : seq of InductionController := [];
 		inv len inductionGroup = NumOfInductions; 
-		inv forall x,y in set elems inductionGroup & x <> y => x.GetId() <> y.GetId();
-		inv forall x in set elems inductionGroup & x.GetId() in set inds inductionGroup;
+		-- Induction id and inds of inductionGroup sequence must be the same
+		inv forall id in set inds inductionGroup & inductionGroup(id).GetId() = id;
 			
 		-- Sorter ring and invariants	
 		public sorterRing : inmap Tray`UID to Tray;
@@ -76,7 +76,7 @@ class TrayAllocator
 			    	countItemsInducted := countItemsInducted + 1;
 					-- ??? comment out during traces in TestSenarious
 					-- 
-					IO`print("Induction id " ^ String`NatToStr(ic.GetId()) ^ "\n");
+					IO`print("*Induction id " ^ String`NatToStr(ic.GetId()) ^ "\n");
 			    	PutItemOnTrays(item, trays);
 			    	return true;
 			    ) 
@@ -92,7 +92,10 @@ class TrayAllocator
 	private InductionsWithHigherPriority: InductionController ==> bool
 	InductionsWithHigherPriority(ic) ==
 		return exists i in set elems inductionGroup(1,...,len inductionGroup) & i.GetId() <> ic.GetId() and i.GetPriority() > ic.GetPriority()
-	-- Looking ahead only -- return exists i in set elems inductionGroup(ic.GetId()+1,...,len inductionGroup) & i.GetPriority() > ic.GetPriority()
+	--  Looking at induction infront this ic causes starvation of the first induction in group
+	--  return exists i in set elems inductionGroup(ic.GetId()+1,...,len inductionGroup) & i.GetPriority() > ic.GetPriority()
+	--  Without prioritation turned on
+	--	return false
 	pre ic in set elems inductionGroup;
 
     -- Returns set of empty trays at trayAtCardReader
@@ -101,12 +104,10 @@ class TrayAllocator
 	(
 		-- Use of strategy pattern to compute the tray allocation
 		dcl strategy : AllocatorStrategy;
-		
 		cases size:
 			1 -> strategy := new AllocatorOneTray(self),
 			2 -> strategy := new AllocatorTwoTray(self)
 		end;
-
 		return strategy.AllocateTray(icid);
 	) 	
 	pre icid in set inds inductionGroup and size <= 2; -- To be changed if ItemMaxTrays is increased
