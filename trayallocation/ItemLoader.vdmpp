@@ -1,0 +1,43 @@
+class ItemLoader
+	types
+
+		inline  =  nat * nat * nat;
+		InputTP   = int * seq of inline;
+	
+	values
+
+	instance variables
+		io : IO := new IO();
+	    inlines  : seq of inline := [];
+	    numTimeSteps : nat;
+		
+	operations
+	
+	public ItemLoader : seq1 of char ==> ItemLoader
+	ItemLoader(fname) == 
+	  def mk_(-,mk_(timeval,input)) = io.freadval[InputTP](fname) 
+	  in
+	    (
+	    	numTimeSteps := timeval;
+	     	inlines := input
+	     );    
+	
+	public GetNumTimeSteps : () ==> nat
+	GetNumTimeSteps() ==
+		return numTimeSteps;
+	
+	public GetItemAtTimeStep : nat * nat1 ==> [Item]
+	GetItemAtTimeStep(t, icid) ==
+	(
+		return nil;
+	);
+			
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end ItemLoader

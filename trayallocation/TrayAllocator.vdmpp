@@ -101,9 +101,11 @@ class TrayAllocator
 	(
 		-- Use of strategy pattern to compute the tray allocation
 		dcl strategy : AllocatorStrategy;
-		if size = 1 
-			then strategy := new AllocatorOneTray(self)
-			else strategy := new AllocatorTwoTray(self);
+		
+		cases size:
+			1 -> strategy := new AllocatorOneTray(self),
+			2 -> strategy := new AllocatorTwoTray(self)
+		end;
 
 		return strategy.AllocateTray(icid);
 	) 	
