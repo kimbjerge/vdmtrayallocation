@@ -45,8 +45,7 @@ class InductionController
 		let item = hd items
 			in item.GetSizeOfTrays()
 	pre priority > 0 and len items > 0;
-		  	
-	
+		  		
     -- Enviroment feeds a new item on induction
 	public FeedItem: Item ==> ()
 	FeedItem(i) ==
@@ -56,8 +55,6 @@ class InductionController
 	public TrayStep: () ==> ()
 	TrayStep() ==
 	(
-		--IO`print("IC Time step\n");
-		
 		-- Induct next item based on InductionRate
 		stepCount := stepCount + 1;
 		if IsItemWaiting() or (stepCount >= InductionRate)
@@ -73,19 +70,20 @@ class InductionController
 	-- If item could not be inducted then increment priority
     private InductNextItem: () ==> ()
     InductNextItem() ==
-		let item = hd items, 
-		    n = len items  
+		let n = len items  
 		in
 			if n > 0
 			then
-			  if allocator.InductItem(self, item)
-			  then
-			    (
-			    	items := tl items;
-			    	priority := 0
-			    )
-			  else 
-			    priority := priority + 1; -- Increment priority wait counter			  		
+				let item = hd items
+			  	in
+			  		if allocator.InductItem(self, item)
+			  		then
+			    	(
+			    		items := tl items;
+			    		priority := 0
+			    	)
+			  		else 
+			    		priority := priority + 1; -- Increment priority wait counter			  		
     
 	functions
 
