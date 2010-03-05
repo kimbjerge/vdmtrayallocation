@@ -21,8 +21,7 @@ class Item
 	    
 	    -- If the item is on the sorter ring the size of trays the item occupies 
 	    -- must be equal to number of tray associations
-	    inv let t = card trays
-	        in t > 0 => sizeOfTrays = t;
+	    -- inv let t = card trays in t > 0 => sizeOfTrays = t;
 	      
 	operations
 	

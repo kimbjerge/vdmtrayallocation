@@ -14,6 +14,9 @@ class InductionController
 		items : seq of Item := [];			-- set of items ready to be inducted
 		stepCount: nat := 0; 				-- Counts the number of steps between inducting items
 	
+		-- If induction is waiting there must be items in sequence
+		inv priority > 0 => len items > 0;
+	
 	operations
 
     -- InductionController constructor
@@ -42,9 +45,12 @@ class InductionController
 	-- Get size of waiting item in number of trays
 	public GetSizeOfWaitingItem: () ==> nat
 	GetSizeOfWaitingItem() ==
-		let item = hd items
-			in item.GetSizeOfTrays()
-	pre priority > 0 and len items > 0;
+		if not IsItemWaiting()
+		then
+			return 0 -- No waiting items
+		else
+			let item = hd items
+				in item.GetSizeOfTrays();
 		  		
     -- Enviroment feeds a new item on induction
 	public FeedItem: Item ==> ()
@@ -79,8 +85,11 @@ class InductionController
 			  		if allocator.InductItem(self, item)
 			  		then
 			    	(
-			    		items := tl items;
-			    		priority := 0
+						atomic -- Due to invariant
+						(
+			    			items := tl items;
+			    			priority := 0
+			    		);
 			    	)
 			  		else 
 			    		priority := priority + 1; -- Increment priority wait counter			  		

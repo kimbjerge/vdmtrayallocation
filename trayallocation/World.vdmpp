@@ -7,18 +7,28 @@ class World
 	values
 
 	instance variables
-		env : SorterEnviroment;
+		env : [SorterEnviroment] := nil;
 		loader : [ItemLoader] := nil;
-		-- Test file that contains test scenarios - items to be feeded on inductions
-	    testfile : seq1 of char := "scenario.txt";
+		
+		-- Test files that contains test scenarios 
+		---     of items to be feeded on inductions
+	    testfile1 : seq1 of char := "scenario1.txt";
+	    testfile2 : seq1 of char := "scenario2.txt";
+	    testfile3 : seq1 of char := "scenario3.txt";
+	    testfile4 : seq1 of char := "scenario4.txt";
+	    testfile5 : seq1 of char := "scenario5.txt";
 	    
+	    testfiles : seq of seq1 of char := [testfile1,
+	    									testfile2,
+	    									testfile3,
+	    									testfile4,
+	    									testfile5];
 	operations
 	
    -- World constructor
 	public World: () ==> World
 	World() ==
 	(
-		env := new SorterEnviroment();
 	);
 
     -- Prints configuration and result of tray allocation model simulation
@@ -60,19 +70,25 @@ class World
 	public Run: () ==> ()
 	Run() ==
 	(
-		loader := new ItemLoader(testfile);
-		env.AssignItemLoader(loader);
-		
-		IO`print("---------------------------------------------\n");
-		IO`print("Tray allocation model : " ^ testfile ^ "\n");
-		IO`print("---------------------------------------------\n");
-		
-		-- Performs simulation based on time steps specified	
-		for all t in set {0,...,loader.GetNumTimeSteps()} 
-		do 
-			env.TimeStep(t);
+		-- Performs model testing for each scenarios specified in test file
+		for all test in set {1,...,len testfiles}
+		do	
+		(	
+			env := new SorterEnviroment();
+			loader := new ItemLoader(testfiles(test));
+			env.AssignItemLoader(loader);
 			
-		PrintSimulationResult();
+			IO`print("---------------------------------------------\n");
+			IO`print("Tray allocation model test #" ^ String`NatToStr(test)^ ": " ^ testfiles(test) ^ "\n");
+			IO`print("---------------------------------------------\n");
+			
+			-- Performs simulation based on time steps	
+			for all t in set {0,...,loader.GetNumTimeSteps()} 
+			do 
+				env.TimeStep(t);
+				
+			PrintSimulationResult();
+		);
 	);
 
 	functions

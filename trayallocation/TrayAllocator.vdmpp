@@ -5,7 +5,7 @@ class TrayAllocator
 	types
 
 	values
-		public InductionSeperation: nat = 3;
+		public InductionSeperation: nat = 2;
 		public NumOfInductions : nat = 3;
 		public NumOfTrays : nat = 20;
 		public SecInHour : nat = 3600 	-- Number of seconds in an hour
@@ -26,10 +26,17 @@ class TrayAllocator
 		-- Sorter ring and invariants	
 		public sorterRing : inmap Tray`UID to Tray;
 		inv card dom sorterRing = NumOfTrays;
+		-- Tray id and dom of sorterRing map must be the same
+		inv forall id in set dom sorterRing & sorterRing(id).GetId() = id;
 		
 		-- Tray at card reader and invariants
 		public trayAtCardReader : Tray`UID := 0;
+		-- trayAtCardReader must be a valid tray in sorterRing
 		inv trayAtCardReader > 0 => trayAtCardReader in set dom sorterRing;
+		
+		-- Allocation "strategy pattern" for one and two tray items
+		oneTrayStrategy : AllocatorOneTray;
+		twoTrayStrategy : AllocatorTwoTray;	
 						
 	operations
 	
@@ -40,6 +47,10 @@ class TrayAllocator
 	    sorterRing := {num |-> new Tray(num) | num in set {1,...,NumOfTrays}};
 	    inductionGroup := [new InductionController(self, num) | num in set {1,...,NumOfInductions}];
         e.AssignInductionGroup(inductionGroup);
+        
+        -- Creating strategies for allocation of one and two tray items
+        oneTrayStrategy := new AllocatorOneTray(self);
+        twoTrayStrategy := new AllocatorTwoTray(self);
 	);
 
     -- Simulate sorter-ring moved one tray step
@@ -61,12 +72,23 @@ class TrayAllocator
 	public InductItem: InductionController * Item ==> bool
 	InductItem(ic, item) ==
 	(
-		if InductionsWithHigherPriority(ic)
+		dcl strategy : AllocatorStrategy;
+		
+		-- Determine the strategy to compute the allocation of trays
+		let numTrays = item.GetSizeOfTrays()
+		in 
+			cases numTrays:
+				1 -> strategy := oneTrayStrategy,
+				2 -> strategy := twoTrayStrategy
+			end;
+		
+		-- Central part of the Tray allocation algorithm 
+		-- Look for inductions with higher priority before allocation of empty trays
+		if InductionsWithHigherPriority(ic, strategy)
 		then
 		 	return false
 		else
-			let numTrays = item.GetSizeOfTrays(),
-				trays = AllocateTray(ic.GetId(), numTrays)
+			let trays = AllocateTray(ic.GetId(), strategy)
 			in 
 			    if trays = {}
 			    then 
@@ -77,40 +99,30 @@ class TrayAllocator
 					-- ??? comment out during traces in TestSenarious
 					-- 
 					IO`print("*Induction id " ^ String`NatToStr(ic.GetId()) ^ "\n");
+					-- Assign item to trays
 			    	PutItemOnTrays(item, trays);
 			    	return true;
 			    ) 
 	)
-	pre ic in set elems inductionGroup;
+	pre ic in set elems inductionGroup and item.GetSizeOfTrays() <= 2;  -- To be changed if Tray`ItemMaxTrays is increased
 	
-	-- Returns true if sorter is full
-	public IsSorterFull: () ==> bool
-	IsSorterFull() ==
-	 	return forall id in set dom sorterRing & sorterRing(id).GetState() = <Full>;
-
-    -- Returns true if no higher priority of inductions in front of this induction
-	private InductionsWithHigherPriority: InductionController ==> bool
-	InductionsWithHigherPriority(ic) ==
-		return exists i in set elems inductionGroup(1,...,len inductionGroup) & i.GetId() <> ic.GetId() and i.GetPriority() > ic.GetPriority()
-	--  Looking at induction infront this ic causes starvation of the first induction in group
-	--  return exists i in set elems inductionGroup(ic.GetId()+1,...,len inductionGroup) & i.GetPriority() > ic.GetPriority()
-	--  Without prioritation turned on
-	--	return false
+    -- Returns true if higher priority inductions in induction group
+	private InductionsWithHigherPriority: InductionController * AllocatorStrategy ==> bool
+	InductionsWithHigherPriority(ic, strategy) ==
+	(
+		-- Use of strategy depending on item tray size to compute the tray allocation
+		return strategy.InductionsWithHigherPriority(ic);
+	) 	
 	pre ic in set elems inductionGroup;
 
     -- Returns set of empty trays at trayAtCardReader
-	private AllocateTray: nat * Item`ItemTraySize ==> set of Tray
-	AllocateTray(icid, size) ==
+	private AllocateTray: nat * AllocatorStrategy ==> set of Tray
+	AllocateTray(icid, strategy) ==
 	(
-		-- Use of strategy pattern to compute the tray allocation
-		dcl strategy : AllocatorStrategy;
-		cases size:
-			1 -> strategy := new AllocatorOneTray(self),
-			2 -> strategy := new AllocatorTwoTray(self)
-		end;
+		-- Use of strategy depending on item tray size to compute the tray allocation
 		return strategy.AllocateTray(icid);
 	) 	
-	pre icid in set inds inductionGroup and size <= 2; -- To be changed if ItemMaxTrays is increased
+	pre icid in set inds inductionGroup;
 	
 	-- Assign item on empty trays 
 	private PutItemOnTrays: Item * set of Tray ==> ()
@@ -120,6 +132,11 @@ class TrayAllocator
 			t.ItemOnTray(item)
 	pre trays <> {} and forall t in set trays & t.IsTrayEmpty();
 	
+	-- Returns true if sorter is full
+	public IsSorterFull: () ==> bool
+	IsSorterFull() ==
+	 	return forall id in set dom sorterRing & sorterRing(id).GetState() = <Full>;
+
 	-- Returns calculated throughput of soter capacity for current state of sorter ring
 	public GetThroughput: () ==> nat * nat * nat * nat * real
 	GetThroughput () ==
