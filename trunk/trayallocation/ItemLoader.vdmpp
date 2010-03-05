@@ -7,8 +7,9 @@ class ItemLoader
 	values
 
 	instance variables
-   	    -- Not working in version 0.1.9
-		--io : IO := new IO(); 
+   	    -- Not working in Overture version 0.1.9
+		io : IO := new IO(); 
+		
 		-- Test with mix of 1 and 2 tray items 
 	    inlines  : seq of inline := [mk_(0,1,100), --  mk_(timeStep, icid, itemSize)
         							 mk_(0,2,800),
@@ -30,30 +31,7 @@ class ItemLoader
         							 mk_(10,3,200)
         							 ];
         							 
-		-- Test with  1 tray items 
-	    inlines1  : seq of inline := [mk_(0,1,500), --  mk_(timeStep, icid, itemSize)
-        							 mk_(0,2,500),
-        							 mk_(0,3,500),
-        							 mk_(2,1,500),
-        							 mk_(2,2,500),
-        							 mk_(2,3,500),
-        							 mk_(4,1,500),
-        							 mk_(4,2,500),
-        							 mk_(4,3,500),
-        							 mk_(6,1,500),
-        							 mk_(6,2,500),
-        							 mk_(6,3,500),
-        							 mk_(8,1,500),
-        							 mk_(8,2,500),
-        							 mk_(8,3,500),
-        							 mk_(10,1,500),
-        							 mk_(10,2,500),
-        							 mk_(10,3,500),
-        							 mk_(12,1,500),
-        							 mk_(12,2,500),
-        							 mk_(12,3,500)
-        							 ];
-	    numTimeSteps : nat := 20;
+	    numTimeSteps : nat := 21;
 		
 	operations
 	
@@ -61,13 +39,13 @@ class ItemLoader
 	public ItemLoader : seq1 of char ==> ItemLoader
 	ItemLoader(fname) ==
 	(
-	  -- Not working in version 0.1.9
-	  --def mk_(-,mk_(timeval,input)) = IO`freadval[InputTP](fname) 
-	  --in
-	  --  (
-	  --  	numTimeSteps := timeval;
-	  --   	inlines := input
-	  --   );    
+	  -- Not working in Overture version 0.1.9
+	  def mk_(-,mk_(timeval,input)) = io.freadval[InputTP](fname) 
+	  in
+	    (
+	    	numTimeSteps := timeval;
+	     	inlines := input
+	     );    
 	); 
 	
 	-- Returns number of time steps to simulate

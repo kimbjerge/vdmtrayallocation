@@ -10,7 +10,11 @@ class AllocatorStrategy
 		
 		public AllocateTray: nat ==> set of Tray
 		AllocateTray (-) ==
-			is subclass responsibility
+			is subclass responsibility;
+		
+		public InductionsWithHigherPriority: InductionController ==> bool
+		InductionsWithHigherPriority(ic) ==
+			is subclass responsibility;
 			
 	functions
 	

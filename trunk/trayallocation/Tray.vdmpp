@@ -30,6 +30,11 @@ class Tray
 		id := i;
 	);
 
+ 	-- Return tray id
+	public GetId: () ==> nat
+	GetId() == 
+		return id;
+		
     -- Returns true if tray is empty
 	public IsTrayEmpty: () ==> bool
 	IsTrayEmpty () ==
