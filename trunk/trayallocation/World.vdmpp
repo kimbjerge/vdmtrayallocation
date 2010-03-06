@@ -48,14 +48,14 @@ class World
 		IO`print("----------------------------------------------\n");
 	
 		-- Prints result of simulation
-		let mk_(traysWithItems, twoTrayItemsOnSorter, traySteps, inductedItems, throughput) = env.sc.allocator.GetThroughput()
+		let r : TrayAllocator`ThroughputResult = env.sc.allocator.GetThroughput()
 		in
 		(
-			IO`print("Number of trays with items       : " ^ String`NatToStr(traysWithItems) ^ "\n");
-			IO`print("Two tray items on sorter         : " ^ String`NatToStr(twoTrayItemsOnSorter) ^ "\n");
-			IO`print("Number of tray steps             : " ^ String`NatToStr(traySteps) ^ "\n");
-			IO`print("Number of inducted items         : " ^ String`NatToStr(inductedItems) ^ "\n");
-			IO`print("Calculated throughput[items/hour]: " ^ String`NatToStr(floor(throughput)) ^ "\n");
+			IO`print("Number of trays with items       : " ^ String`NatToStr(r.traysWithItemOnSorter) ^ "\n");
+			IO`print("Two tray items on sorter         : " ^ String`NatToStr(r.twoTrayItemsOnSorter) ^ "\n");
+			IO`print("Number of tray steps             : " ^ String`NatToStr(r.traySteps) ^ "\n");
+			IO`print("Number of inducted items         : " ^ String`NatToStr(r.inductedItems) ^ "\n");
+			IO`print("Calculated throughput[items/hour]: " ^ String`NatToStr(floor(r.calcThroughput)) ^ "\n");
 		);    
 
 		IO`print("----------------------------------------------\n");
