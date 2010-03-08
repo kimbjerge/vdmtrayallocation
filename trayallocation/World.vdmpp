@@ -41,6 +41,9 @@ class World
 		IO`print("---------------------------------------------\n");
         IO`print("Specified throughput [items/hour]: " ^ String`NatToStr(SorterEnviroment`Throughput) ^ "\n");
         IO`print("Sorter speed             [mm/sec]: " ^ String`NatToStr(SorterEnviroment`Speed) ^ "\n");
+        IO`print("Item max size                [mm]: " ^ String`NatToStr(Item`ItemMaxSize) ^ "\n");
+        IO`print("Item min size                [mm]: " ^ String`NatToStr(Item`ItemMinSize) ^ "\n");
+        IO`print("Tray size                    [mm]: " ^ String`NatToStr(Tray`TraySize) ^ "\n");
         IO`print("Number of trays                  : " ^ String`NatToStr(TrayAllocator`NumOfTrays) ^ "\n");
         IO`print("Number of inductions             : " ^ String`NatToStr(TrayAllocator`NumOfInductions) ^ "\n");
         IO`print("Induction rate                   : " ^ String`NatToStr(InductionController`InductionRate) ^ "\n");
