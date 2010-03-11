@@ -16,6 +16,7 @@ class Tray
 		-- in this case an unknown item is detected by the card reader
 		state : State := <Empty>;
 		item : [Item] := nil;
+		
 		-- If an item is associated with a tray the state must be <Full>
 		inv item <> nil => state = <Full>;
 		
@@ -76,7 +77,6 @@ class Tray
 		);
 		item.AssignItemToTray(self);
 
-		-- ??? comment out during traces in TestSenarious
 		IO`print("-> Item id " ^ String`NatToStr(item.GetId()) ^ 
 		         "size " ^ String`NatToStr(item.GetSize()) ^ 
 		         "on tray id " ^ String`NatToStr(id) ^ "\n");

@@ -91,11 +91,11 @@ class TrayAllocator
 		
 		-- Central part of the Tray allocation algorithm 
 		-- Look for inductions with higher priority before allocation of empty trays
-		if InductionsWithHigherPriority(ic, strategy)
+		if strategy.InductionsWithHigherPriority(ic)
 		then
 		 	return false
 		else
-			let trays = AllocateTray(ic.GetId(), strategy)
+			let trays = strategy.AllocateTray(ic.GetId())
 			in 
 			    if trays = {}
 			    then 
@@ -103,8 +103,6 @@ class TrayAllocator
 			    else
 			    ( 
 			    	countItemsInducted := countItemsInducted + 1;
-					-- ??? comment out during traces in TestSenarious
-					-- 
 					IO`print("*Induction id " ^ String`NatToStr(ic.GetId()) ^ "\n");
 					-- Assign item to trays
 			    	PutItemOnTrays(item, trays);
@@ -112,24 +110,6 @@ class TrayAllocator
 			    ) 
 	)
 	pre ic in set elems inductionGroup and item.GetSizeOfTrays() <= 2;  -- To be changed if Tray`ItemMaxTrays is increased
-	
-    -- Returns true if higher priority inductions in induction group
-	private InductionsWithHigherPriority: InductionController * AllocatorStrategy ==> bool
-	InductionsWithHigherPriority(ic, strategy) ==
-	(
-		-- Use of strategy depending on item tray size to compute the tray allocation
-		return strategy.InductionsWithHigherPriority(ic);
-	) 	
-	pre ic in set elems inductionGroup;
-
-    -- Returns set of empty trays at trayAtCardReader
-	private AllocateTray: nat * AllocatorStrategy ==> set of Tray
-	AllocateTray(icid, strategy) ==
-	(
-		-- Use of strategy depending on item tray size to compute the tray allocation
-		return strategy.AllocateTray(icid);
-	) 	
-	pre icid in set inds inductionGroup;
 	
 	-- Assign item on empty trays 
 	private PutItemOnTrays: Item * set of Tray ==> ()

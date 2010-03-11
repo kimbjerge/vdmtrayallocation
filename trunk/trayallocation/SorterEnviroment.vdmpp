@@ -48,7 +48,6 @@ class SorterEnviroment
 	TimeStep(t) ==
 	(
 
-		-- ??? comment out during traces in TestSenarious
 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do 
 		(
