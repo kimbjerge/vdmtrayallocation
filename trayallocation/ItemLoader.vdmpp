@@ -1,3 +1,8 @@
+-- ===============================================================================================================
+-- ItemLoader in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+-- ===============================================================================================================
+
 class ItemLoader
 	types
 
@@ -43,7 +48,7 @@ class ItemLoader
 	  def mk_(-,mk_(timeval,input)) = io.freadval[InputTP](fname) 
 	  in
 	    (
-	    	numTimeSteps := timeval;
+	   		numTimeSteps := timeval;
 	     	inlines := input
 	     );    
 	); 
