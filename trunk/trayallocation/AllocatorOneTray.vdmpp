@@ -1,6 +1,8 @@
+-- ===============================================================================================================
 -- AllocatorOneTray in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
 -- (strategy pattern)
+-- ===============================================================================================================
 
 class AllocatorOneTray is subclass of AllocatorStrategy
 
