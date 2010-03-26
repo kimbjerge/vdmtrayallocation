@@ -63,15 +63,23 @@ class ItemLoader
 	public GetItemAtTimeStep : nat * nat1 ==> nat
 	GetItemAtTimeStep(timeStep, icid) ==
 	(
-		-- {size | mk_(time, id, size) in set elems inlines & time = timestep and id = icid};
-		let elm = {e | e in set elems inlines & e.#1 = timeStep and e.#2 = icid}
-		in
-	 		if elm = {}
-	 		then return 0
-	 		else
-	 			let {mk_(-,-,size)} = elm
-	 			in 
-	 				return size;
+		let elm = {size | mk_(time, id, size) in set elems inlines & time = timeStep and id = icid}
+		in 
+		   if elm = {}
+		   then 
+		     return 0
+		   else 
+		   	 let {si} = elm
+		   	 in 
+		   	 	return si;
+		--let elm = {e | e in set elems inlines & e.#1 = timeStep and e.#2 = icid}
+		--in
+	 	--	if elm = {}
+	 	--	then return 0
+	 	--	else
+	 	--		let {mk_(-,-,size)} = elm
+	 	--		in 
+	 	--			return size;
 	);
 			
 	functions

@@ -16,7 +16,7 @@ class Item
 	instance variables
 	    id : nat;	   		 			  -- Item ID for induction
 	    size : nat1;		 			  -- Item size in mm
-	    inv size >= ItemMinSize and size <= ItemMaxSize;
+	    inv SizeLimits(size);
 	    
 	    sizeOfTrays : ItemTraySize; 	  -- Number of trays item occupies
 	    trays : set of Tray := {};
@@ -34,7 +34,8 @@ class Item
 		size := s;
     	sizeOfTrays := size div Tray`TraySize + 1;
 		id := i;
-	);
+	)
+	pre SizeLimits(s);
 	
 	-- Return item id
 	public GetId: () ==> nat
@@ -62,6 +63,11 @@ class Item
 	post trays = {}; 
 				
 	functions
+	
+	-- Function to check invariant and post condition on limits for size
+	SizeLimits: nat -> bool
+	SizeLimits(s) ==
+		s >= ItemMinSize and s <= ItemMaxSize;
 
 	sync
 

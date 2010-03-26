@@ -116,10 +116,18 @@ class TrayAllocator
 	-- Assign item on empty trays 
 	private PutItemOnTrays: Item * set of Tray ==> ()
 	PutItemOnTrays(item, trays) ==
-	 	for all t in set trays
-		do
-			t.ItemOnTray(item)
-	pre trays <> {} and forall t in set trays & t.IsTrayEmpty();
+		if trays <> {} then
+		let t in set trays
+		in 
+		( 
+			t.ItemOnTray(item);
+			PutItemOnTrays(item, trays \ {t});
+		)
+	pre trays <> {} => forall t in set trays & t.IsTrayEmpty();
+	-- 	for all t in set trays
+	--	do
+	--		t.ItemOnTray(item)
+	-- pre trays <> {} and forall t in set trays & t.IsTrayEmpty();
 	
 	-- Returns true if sorter is full
 	public IsSorterFull: () ==> bool
