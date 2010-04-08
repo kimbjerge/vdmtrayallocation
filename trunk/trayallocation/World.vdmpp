@@ -19,12 +19,17 @@ class World
 	    testfile3 : seq1 of char := "scenario3.txt";
 	    testfile4 : seq1 of char := "scenario4.txt";
 	    testfile5 : seq1 of char := "scenario5.txt";
-	    
+
+		/*	    
 	    testfiles : seq of seq1 of char := [testfile1,
 	    									testfile2,
 	    									testfile3,
 	    									testfile4,
 	    									testfile5];
+        */
+        
+	    testfiles : seq of seq1 of char := [testfile1];
+	    
 	operations
 	
    -- World constructor
