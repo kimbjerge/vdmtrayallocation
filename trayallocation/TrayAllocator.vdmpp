@@ -39,9 +39,9 @@ class TrayAllocator
 		inv forall id in set dom sorterRing & sorterRing(id).GetId() = id;
 		
 		-- Tray at card reader and invariants
-		public trayAtCardReader : Tray`UID := 0;
+		public trayAtCardReader : [Tray`UID] := nil;
 		-- trayAtCardReader must be a valid tray in sorterRing
-		inv trayAtCardReader > 0 => trayAtCardReader in set dom sorterRing;
+		inv trayAtCardReader <> nil  => trayAtCardReader in set dom sorterRing;
 		
 		-- Allocation "strategy pattern" for one and two tray items
 		oneTrayStrategy : AllocatorOneTray;
@@ -123,7 +123,7 @@ class TrayAllocator
 			t.ItemOnTray(item);
 			PutItemOnTrays(item, trays \ {t});
 		)
-	pre trays <> {} => forall t in set trays & t.IsTrayEmpty();
+	pre forall t in set trays & t.IsTrayEmpty();
 	-- 	for all t in set trays
 	--	do
 	--		t.ItemOnTray(item)
