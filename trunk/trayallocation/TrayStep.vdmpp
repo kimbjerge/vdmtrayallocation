@@ -1,0 +1,40 @@
+class TrayStep
+
+instance variables
+
+	tid : int := -1;
+	public static stepTime : int := -1; 	   -- Time it takes to move a tray in ms
+	public static counts : nat := 0;
+
+operations
+
+	public TrayStep : nat * nat1 ==> TrayStep
+	TrayStep(t, speed) == 
+	(
+		tid := t;
+		stepTime := (Tray`Size*1000)/speed;    -- [mm]*1000 / [mm/sec]
+	);
+	
+	--public static GetCounts : () ==> nat
+	--GetCounts () == return counts;
+	
+	--public static IncCounts : () ==> ()
+	--IncCounts () == counts := counts + 1;
+	
+sync
+	--mutex(GetCounts, IncCounts);			  -- Block reading counter while incrementing
+	--mutex(IncCounts);						  -- Only one thread allowed to increment TrayStep counts
+	
+thread 
+
+	while true do
+ 	(
+   		-- IncCounts();
+   		counts := counts + 1;
+  	    IO`print("< " ^ String`NatToStr(counts) ^ ">");
+   		World`timerRef.WaitRelative(stepTime);
+   		World`timerRef.NotifyAll();
+   		World`timerRef.Awake();
+ 	)
+
+ end TrayStep

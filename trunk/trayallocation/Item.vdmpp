@@ -6,12 +6,12 @@
 class Item
 	types
 	    public ItemTraySize = nat1
-	    inv it == it <= ItemMaxTrays;  	  -- Limitation on how many trays an item occupies 
+	    inv it == it <= MaxTrays;  	      -- Limitation on how many trays an item occupies 
 
 	values
-		public ItemMaxSize : nat = 1500;  -- Item maximum size in mm
-		public ItemMinSize : nat = 100;   -- Item minimum size in mm
-		public ItemMaxTrays: nat = 2;	  -- Maimum number of trays an item occupies
+		public MaxSize : nat = 1500;  	  -- Item maximum size in mm
+		public MinSize : nat = 100;   	  -- Item minimum size in mm
+		public MaxTrays: nat = 2;	      -- Maimum number of trays an item occupies
 
 	instance variables
 	    id : nat;	   		 			  -- Item ID for induction
@@ -32,7 +32,7 @@ class Item
 	Item(s, i) ==
 	(
 		size := s;
-    	sizeOfTrays := size div Tray`TraySize + 1;
+    	sizeOfTrays := size div Tray`Size + 1;
 		id := i;
 	)
 	pre SizeLimits(s);
@@ -67,7 +67,7 @@ class Item
 	-- Function to check invariant and post condition on limits for size
 	SizeLimits: nat -> bool
 	SizeLimits(s) ==
-		s >= ItemMinSize and s <= ItemMaxSize;
+		s >= MinSize and s <= MaxSize;
 
 	sync
 
