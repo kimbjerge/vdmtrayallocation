@@ -7,7 +7,7 @@ class SorterEnviroment
 	types
 
 	values
-		public Speed	   : nat = 2000;  -- Sorter speed mm/sec
+		public Speed	   : nat1 = 2000;  -- Sorter speed mm/sec
 		public Throughput  : nat = 10000;  -- Required items/hour
 				
 
@@ -16,6 +16,8 @@ class SorterEnviroment
 		public inductionGroup : seq of InductionController := [];
 		itemId : nat := 0;
 		itemLoader : [ItemLoader] := nil;
+		busy : bool := true;
+		traySteps : int := -1;
 				
 	operations
 	
@@ -74,13 +76,63 @@ class SorterEnviroment
 
 	);
 	
+	public isFinished : () ==> () 
+	isFinished() == skip;
 	
 	functions
 
 	sync
+	
+	per isFinished => not busy;
 
-	--thread
+	thread
+    (
+    	start(new TrayStep(threadid, Speed));   
+    	 	
+  		while busy do
+   		(
+   		
+ 			if (traySteps <> TrayStep`counts) then
+ 			(
+				IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
+			   	traySteps := TrayStep`counts;
+ 	 	 	   	for all i in set {1,...,TrayAllocator`NumOfInductions} 
+			   	do 
+			   	(
+				 	-- Check for item to feed induction at tray step
+				 	let size = itemLoader.GetItemAtTimeStep(traySteps, i)
+				 	in
+						if (size > 0)
+						then 
+						(
+				  			itemId := itemId + 1;
+				  			inductionGroup(i).FeedItem(new Item(size, itemId));
+						);
+	 		   	);
+	 		   
+	    		-- Enviroment simulate sorter moved one tray step
+				sc.TrayStep(traySteps mod TrayAllocator`NumOfTrays + 1, <Empty>);
+		
+	 			-- Performs tray step for each induction
+		 		for all i in set {1,...,TrayAllocator`NumOfInductions} 
+				do 
+			   		inductionGroup(i).TrayStep();
+	 		);
+	 		
+			IO`print(".");
+			World`timerRef.WaitRelative(0);
+	   		World`timerRef.NotifyAndIncTime();
+	  		World`timerRef.Awake();
 
+            -- Check if simulation is finish
+   			if (traySteps >= itemLoader.GetNumTimeSteps()) then
+   				busy := false;
+
+   		);
+
+   	);
+
+ 
 	traces
 	
 end SorterEnviroment

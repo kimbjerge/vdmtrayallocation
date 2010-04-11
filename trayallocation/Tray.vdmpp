@@ -10,7 +10,7 @@ class Tray
 	    inv u == u <= TrayAllocator`NumOfTrays;  	-- Limitation on UID 
 
 	values
-		public TraySize    : nat1 = 600    			-- Size of any tray mm 
+		public Size    : nat1 = 600    			    -- Size of any tray mm 
 
 	instance variables
 	    

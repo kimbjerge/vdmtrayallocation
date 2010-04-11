@@ -149,7 +149,7 @@ class TrayAllocator
 	*/
 	private CalculateThroughput: nat * set of Tray * nat-> ThroughputResult
 	CalculateThroughput(steps, trays, items) ==
-		let runTime :real = steps * (Tray`TraySize/SorterEnviroment`Speed),
+		let runTime :real = steps * (Tray`Size/SorterEnviroment`Speed),
 			traysWithItems = {twi | twi in set trays & twi.IsTrayFull()},
 			traysWith2Items = {tw2i | tw2i in set traysWithItems & tw2i.GetItem() <> nil and tw2i.GetItem().GetSizeOfTrays() = 2},
 			itemsOnSorter = card traysWithItems, 

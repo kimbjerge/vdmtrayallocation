@@ -30,6 +30,8 @@ class World
         
 	    testfiles : seq of seq1 of char := [testfile1];
 	    
+	    public static timerRef : TimeStamp := new TimeStamp();    
+	    
 	operations
 	
    -- World constructor
@@ -48,9 +50,9 @@ class World
 		IO`print("---------------------------------------------\n");
         IO`print("Specified throughput [items/hour]: " ^ String`NatToStr(SorterEnviroment`Throughput) ^ "\n");
         IO`print("Sorter speed             [mm/sec]: " ^ String`NatToStr(SorterEnviroment`Speed) ^ "\n");
-        IO`print("Item max size                [mm]: " ^ String`NatToStr(Item`ItemMaxSize) ^ "\n");
-        IO`print("Item min size                [mm]: " ^ String`NatToStr(Item`ItemMinSize) ^ "\n");
-        IO`print("Tray size                    [mm]: " ^ String`NatToStr(Tray`TraySize) ^ "\n");
+        IO`print("Item max size                [mm]: " ^ String`NatToStr(Item`MaxSize) ^ "\n");
+        IO`print("Item min size                [mm]: " ^ String`NatToStr(Item`MinSize) ^ "\n");
+        IO`print("Tray size                    [mm]: " ^ String`NatToStr(Tray`Size) ^ "\n");
         IO`print("Number of trays                  : " ^ String`NatToStr(TrayAllocator`NumOfTrays) ^ "\n");
         IO`print("Number of inductions             : " ^ String`NatToStr(TrayAllocator`NumOfInductions) ^ "\n");
         IO`print("Induction rate                   : " ^ String`NatToStr(InductionController`InductionRate) ^ "\n");
@@ -88,15 +90,19 @@ class World
 			loader := new ItemLoader(testfiles(test));
 			env.AssignItemLoader(loader);
 			
+			start(env); -- Start thread in enviroment
+			
 			IO`print("---------------------------------------------\n");
 			IO`print("Tray allocation model test #" ^ String`NatToStr(test)^ ": " ^ testfiles(test) ^ "\n");
 			IO`print("---------------------------------------------\n");
 			
+			-- Sequential model
 			-- Performs simulation based on time steps	
-			for all t in set {0,...,loader.GetNumTimeSteps()} 
-			do 
-				env.TimeStep(t);
-				
+			-- for all t in set {0,...,loader.GetNumTimeSteps()} 
+			-- do 
+			--	env.TimeStep(t);
+			
+			env.isFinished();
 			PrintSimulationResult();
 		);
 	);
