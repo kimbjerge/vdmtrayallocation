@@ -10,6 +10,7 @@ class SC
 		
 	instance variables
 		public allocator : TrayAllocator;
+		public cardReader : CardReader;
 	
 	operations
 	
@@ -18,6 +19,7 @@ class SC
 	SC(e) ==
 	(
         allocator := new TrayAllocator(e); 
+		cardReader := new CardReader(allocator);
 	);
 
 	

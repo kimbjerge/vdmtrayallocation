@@ -18,6 +18,8 @@ class SorterEnviroment
 		itemLoader : [ItemLoader] := nil;
 		busy : bool := true;
 		traySteps : int := -1;
+	
+	    public static trayStep : TrayStep := new TrayStep(Speed);    
 				
 	operations
 	
@@ -87,10 +89,9 @@ class SorterEnviroment
 
 	thread
     (
-    	start(new TrayStep(threadid, Speed));     	
-		
-		-- start (sc.cardReader);
-		
+        -- Start all threads in the system
+    	start (trayStep);     	
+		start (sc.cardReader);
    		for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do start (inductionGroup(i));
     	 	
@@ -99,8 +100,8 @@ class SorterEnviroment
    		
  			if (traySteps <> TrayStep`counts) then
  			(
-				IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
 			   	traySteps := TrayStep`counts;
+				--IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
  	 	 	   	for all i in set {1,...,TrayAllocator`NumOfInductions} 
 			   	do 
 			   	(
@@ -116,15 +117,15 @@ class SorterEnviroment
 	 		   	);
 	 		   
 	    		-- Enviroment simulate sorter moved one tray step
-				sc.TrayStep(traySteps mod TrayAllocator`NumOfTrays + 1, <Empty>);
+				-- sc.TrayStep(traySteps mod TrayAllocator`NumOfTrays + 1, <Empty>);
 		
 	 			-- Performs tray step for each induction
-		 		--for all i in set {1,...,TrayAllocator`NumOfInductions} 
-				--do 
-			   	--	inductionGroup(i).TrayStep();
+		 		-- for all i in set {1,...,TrayAllocator`NumOfInductions} 
+				-- do 
+			   	--	 inductionGroup(i).TrayStep();
 	 		);
 	 		
-			IO`print(".");
+			--IO`print(".");
 			World`timerRef.WaitRelative(0);
 	   		World`timerRef.NotifyAndIncTime();
 	  		World`timerRef.Awake();

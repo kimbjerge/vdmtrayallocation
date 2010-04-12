@@ -162,6 +162,8 @@ class TrayAllocator
 
 	sync
 
+	mutex(InductItem);  -- Only allows one induction at a time to induct items
+	
 	--thread
 
 	traces
