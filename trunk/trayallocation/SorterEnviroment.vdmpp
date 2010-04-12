@@ -87,7 +87,12 @@ class SorterEnviroment
 
 	thread
     (
-    	start(new TrayStep(threadid, Speed));   
+    	start(new TrayStep(threadid, Speed));     	
+		
+		-- start (sc.cardReader);
+		
+   		for all i in set {1,...,TrayAllocator`NumOfInductions} 
+		do start (inductionGroup(i));
     	 	
   		while busy do
    		(
@@ -114,9 +119,9 @@ class SorterEnviroment
 				sc.TrayStep(traySteps mod TrayAllocator`NumOfTrays + 1, <Empty>);
 		
 	 			-- Performs tray step for each induction
-		 		for all i in set {1,...,TrayAllocator`NumOfInductions} 
-				do 
-			   		inductionGroup(i).TrayStep();
+		 		--for all i in set {1,...,TrayAllocator`NumOfInductions} 
+				--do 
+			   	--	inductionGroup(i).TrayStep();
 	 		);
 	 		
 			IO`print(".");
