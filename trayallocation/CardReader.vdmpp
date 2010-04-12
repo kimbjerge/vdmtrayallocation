@@ -1,0 +1,18 @@
+class CardReader
+	types
+
+	values
+
+	instance variables
+
+	operations
+
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end CardReader

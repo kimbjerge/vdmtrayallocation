@@ -15,6 +15,7 @@ class InductionController
 		allocator : TrayAllocator; 			-- TrayAllocator
 		items : seq of Item := [];			-- set of items ready to be inducted
 		stepCount: nat := 0; 				-- Counts the number of steps between inducting items
+		traySteps : int := -1;				-- Copy of current tray steps
 	
 		-- If induction is waiting there must be items in sequence
 		inv priority > 0 => len items > 0;
@@ -100,7 +101,25 @@ class InductionController
 
 	sync
 
-	--thread
+	thread
+		while (true) do
+		(
+			-- Induct next item based on InductionRate
+			if (traySteps <> TrayStep`counts) 
+			then
+			(
+				traySteps := TrayStep`counts;
+				stepCount := stepCount + 1;
+		   		
+				if IsItemWaiting() or (stepCount >= InductionRate)
+				then
+				(
+					InductNextItem();
+			   		--World`timerRef.WaitRelative(InductionRate * someting);
+					stepCount := 0;
+				)
+			)
+		);
 
 	traces
 
