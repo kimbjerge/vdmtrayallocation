@@ -46,24 +46,22 @@ operations
     	do
       		RemoveFromMap(t);
       			
- 	--public static GetCounts : () ==> nat
-	--GetCounts () == return counts;
+ 	public static GetCounts : () ==> nat
+	GetCounts () == return counts;
 	
-	--public static IncCounts : () ==> ()
-	--IncCounts () == counts := counts + 1;
+	IncCounts : () ==> ()
+	IncCounts () == counts := counts + 1;
 	
 sync
 	per Wait => threadid not in set dom waitTrayStepMap;
 	
-	--mutex(GetCounts, IncCounts);			  -- Block reading counter while incrementing
-	--mutex(IncCounts);						  -- Only one thread allowed to increment TrayStep counts
+	-- mutex(GetCounts, IncCounts);			  -- Block reading counter while incrementing
 	
 thread 
 
 	while true do
  	(
-   		-- IncCounts();
-   		counts := counts + 1;
+   		IncCounts();
    		NotifyWatingThreads();
 
    	    IO`print("< " ^ String`NatToStr(counts) ^ ">");

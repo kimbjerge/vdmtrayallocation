@@ -12,6 +12,7 @@ class TrayAllocator
 						traySteps : nat
 						inductedItems : nat
 						calcThroughput : real;
+		
 
 	values
 		public InductionSeperation: nat = 2;
@@ -46,6 +47,9 @@ class TrayAllocator
 		-- Allocation "strategy pattern" for one and two tray items
 		oneTrayStrategy : AllocatorOneTray;
 		twoTrayStrategy : AllocatorTwoTray;	
+		
+		-- Map of waiting inductions with an item to be inducted 
+		itemsToInduct : map nat to (InductionController * Item) := {|->};
 						
 	operations
 	
@@ -138,7 +142,48 @@ class TrayAllocator
 	public GetThroughput: () ==> ThroughputResult
 	GetThroughput () ==
 		CalculateThroughput(countTraySteps, rng sorterRing, countItemsInducted);
+	 
+	-- Called by InductionController thread requesting to induct item
+	public RequestTray: nat * InductionController * Item ==> ()
+	RequestTray (t, ic, item) ==
+			AddItem(t, ic, item)
+	pre t not in set dom itemsToInduct;
 		
+    -- Thread blocked until removed from Map waitingICs
+	public Wait: () ==> ()
+	Wait() == skip;
+
+    -- Add induction waiting with item to induct
+	AddItem: nat * InductionController * Item ==> ()
+	AddItem (t, ic, item) ==
+			itemsToInduct := itemsToInduct munion {t |-> mk_(ic, item)}
+	pre t not in set dom itemsToInduct;
+	
+    -- Remove induction waiting with item to induct
+	RemoveItem: nat ==> ()
+	RemoveItem (t) ==
+			itemsToInduct := {t} <-: itemsToInduct
+	pre t in set dom itemsToInduct;
+	
+	-- Returns 
+	CheckItemsToInduct: () ==> ()
+	CheckItemsToInduct () ==
+	(
+		-- Induct items for all waiting inductions
+		for all t in set dom itemsToInduct
+		do
+			let mk_(ic, item) = itemsToInduct(t)
+			in
+				if InductItem(ic, item) then
+				(
+					ic.InductFirstItem();
+					RemoveItem(t);
+				)
+				else 
+					ic.IncrementPriority();
+	);
+			
+
 	functions
 
 	-- Calculates the current throughput based on items on sorter ring 
@@ -162,13 +207,23 @@ class TrayAllocator
 
 	sync
 
-	mutex(InductItem);  -- Only allows one induction at a time to induct items
+	-- mutex(InductItem);  -- Only allows one induction at a time to induct items
+
+	mutex(RequestTray);  -- Only allows one induction at a time to induct items
+	-- Mutex to ensure syncronization between InductionController and TrayAllocator
+	mutex(RequestTray, CheckItemsToInduct);
+	-- Permission predicate on Wait operation
+	per Wait => threadid not in set dom itemsToInduct;
 	
 	thread
 		while (true) do
 		(
+		    -- Wait time equal to one tray step
 			SorterEnviroment`trayStep.WaitSteps(1);
-			CardReader(TrayStep`counts mod TrayAllocator`NumOfTrays + 1, <Empty>);
+			CardReader(TrayStep`GetCounts() mod TrayAllocator`NumOfTrays + 1, <Empty>);
+			
+			-- Induct items for all waiting inductions
+			CheckItemsToInduct();
 		);
 
 	traces

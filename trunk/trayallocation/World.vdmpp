@@ -9,7 +9,8 @@ class World
 	values
 
 	instance variables
-		env : [SorterEnviroment] := nil;
+	
+		public static env : [SorterEnviroment] := nil;
 		loader : [ItemLoader] := nil;
 		
 		-- Test files that contains test scenarios 
