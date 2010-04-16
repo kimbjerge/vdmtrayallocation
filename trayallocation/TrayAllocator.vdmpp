@@ -164,7 +164,12 @@ class TrayAllocator
 
 	mutex(InductItem);  -- Only allows one induction at a time to induct items
 	
-	--thread
+	thread
+		while (true) do
+		(
+			SorterEnviroment`trayStep.WaitSteps(1);
+			CardReader(TrayStep`counts mod TrayAllocator`NumOfTrays + 1, <Empty>);
+		);
 
 	traces
 

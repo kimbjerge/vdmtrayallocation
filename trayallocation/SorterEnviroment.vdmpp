@@ -17,7 +17,6 @@ class SorterEnviroment
 		itemId : nat := 0;
 		itemLoader : [ItemLoader] := nil;
 		busy : bool := true;
-		traySteps : int := -1;
 	
 	    public static trayStep : TrayStep := new TrayStep(Speed);    
 				
@@ -91,47 +90,36 @@ class SorterEnviroment
     (
         -- Start all threads in the system
     	start (trayStep);     	
-		start (sc.cardReader);
+		start (sc.allocator);
    		for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do start (inductionGroup(i));
     	 	
   		while busy do
    		(
-   		
- 			if (traySteps <> TrayStep`counts) then
- 			(
-			   	traySteps := TrayStep`counts;
-				--IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
- 	 	 	   	for all i in set {1,...,TrayAllocator`NumOfInductions} 
-			   	do 
-			   	(
-				 	-- Check for item to feed induction at tray step
-				 	let size = itemLoader.GetItemAtTimeStep(traySteps, i)
-				 	in
-						if (size > 0)
-						then 
-						(
-				  			itemId := itemId + 1;
-				  			inductionGroup(i).FeedItem(new Item(size, itemId));
-						);
-	 		   	);
-	 		   
-	    		-- Enviroment simulate sorter moved one tray step
-				-- sc.TrayStep(traySteps mod TrayAllocator`NumOfTrays + 1, <Empty>);
-		
-	 			-- Performs tray step for each induction
-		 		-- for all i in set {1,...,TrayAllocator`NumOfInductions} 
-				-- do 
-			   	--	 inductionGroup(i).TrayStep();
+ 			
+ 	 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
+			do 
+			(
+				-- Check for item to feed induction at tray step
+			 	--let size = itemLoader.GetItemAtTimeStep(traySteps, i)
+			 	let size = itemLoader.GetItemAtTimeStep(World`timerRef.GetTime(), i)
+			 	in
+					if (size > 0)
+					then 
+					(
+			  			itemId := itemId + 1;
+					    IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
+			  			inductionGroup(i).FeedItem(new Item(size, itemId));
+					);
 	 		);
-	 		
+	 		   	 		
 			--IO`print(".");
 			World`timerRef.WaitRelative(0);
 	   		World`timerRef.NotifyAndIncTime();
 	  		World`timerRef.Awake();
 
             -- Check if simulation is finish
-   			if (traySteps >= itemLoader.GetNumTimeSteps()) then
+   			if (World`timerRef.GetTime() >= itemLoader.GetNumTimeSteps()) then
    				busy := false;
 
    		);
