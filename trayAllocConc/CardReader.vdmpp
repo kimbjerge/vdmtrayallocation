@@ -1,0 +1,33 @@
+class CardReader
+	types
+
+	values
+
+	instance variables
+		allocator : TrayAllocator;
+		traySteps : int := -1;				-- Copy of current tray steps
+
+	operations
+	
+    -- CardReader constructor
+	public CardReader: TrayAllocator ==> CardReader
+	CardReader(a) ==
+	(
+        allocator := a; 
+	);
+
+	functions
+
+	sync
+
+	thread
+		while (true) do
+		(
+			SorterEnviroment`trayStep.WaitSteps(1);
+			traySteps := TrayStep`counts;
+			allocator.CardReader(traySteps mod TrayAllocator`NumOfTrays + 1, <Empty>);
+		);
+
+	traces
+
+end CardReader
