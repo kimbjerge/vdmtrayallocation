@@ -10,7 +10,7 @@ class SorterEnviroment
 		public Speed	   : nat1 = 2000;  -- Sorter speed mm/sec
 		public Throughput  : nat = 10000;  -- Required items/hour
 				
-
+				
 	instance variables
 		public sc : SC;
 		public inductionGroup : seq of InductionController := [];
