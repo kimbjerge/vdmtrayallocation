@@ -100,6 +100,7 @@ class InductionController
 	sync
 		-- Ensure mutex access to item sequence
 		mutex (FeedItem, InductNextItem);
+		mutex (FeedItem);
 		
 		-- Block thread if no items to induct 
 		per InductNextItem => len items > 0;
