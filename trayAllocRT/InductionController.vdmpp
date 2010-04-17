@@ -1,0 +1,136 @@
+-- ===============================================================================================================
+-- InductionController in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+-- ===============================================================================================================
+
+class InductionController
+	types
+
+	values
+		public InductionRate : nat = 2;    	-- trays between each item
+		public InductionRateInMs : nat = (InductionRate * Tray`Size * 1000) / SorterEnviroment`Speed; -- [mm] / [mm/msec]
+
+	instance variables		
+		priority : nat := 0;				-- priotity of induction, incremented each time wait to induct item
+		id : nat1;							-- Induction ID 
+		allocator : TrayAllocator; 			-- TrayAllocator
+		items : seq of Item := [];			-- set of items ready to be inducted
+		stepCount: nat := 0; 				-- Counts the number of steps between inducting items
+		selfIC : InductionController;
+	
+		-- If induction is waiting there must be items in sequence
+		inv priority > 0 => len items > 0;
+	
+	operations
+
+    -- InductionController constructors
+	public InductionController: TrayAllocator * nat ==> InductionController
+	InductionController(a, n) ==
+	(
+		allocator := a;
+		id := n;
+		selfIC := self;
+	);
+	
+	public InductionController: nat ==> InductionController
+	InductionController(n) ==
+	(
+		id := n;
+		selfIC := self;
+	);
+
+	public AssignAllocator: TrayAllocator ==> ()
+	AssignAllocator(a) ==
+		allocator := a;
+		
+	-- Returns induction controller UID
+	public GetId: () ==> nat
+	GetId() == 
+		return id;
+	
+	-- Returns priority of induction controller	
+	public GetPriority: () ==> nat
+	GetPriority() == 
+		return priority;
+	
+	-- Returns true if induction is wating with an item
+	public IsItemWaiting: () ==> bool
+	IsItemWaiting() ==
+		return priority > 0;		
+		
+	-- Get size of waiting item in number of trays
+	public GetSizeOfWaitingItem: () ==> nat
+	GetSizeOfWaitingItem() ==
+		if not IsItemWaiting()
+		then
+			return 0 -- No waiting items
+		else
+			let item = hd items
+				in item.GetSizeOfTrays();
+		  		
+    -- Enviroment feeds a new item on induction
+	public FeedItem: Item ==> ()
+	FeedItem(i) ==
+		items := items ^ [i];
+
+    -- Returns the next item to be inducted
+    GetFirstItem: () ==> Item
+    GetFirstItem() ==
+    	return hd items
+    pre len items <> 0;
+    
+    -- Removes the first item in sequence and clear priority - called from TrayAllocator
+ 	public InductFirstItem: () ==> ()
+ 	InductFirstItem() ==
+		atomic -- Due to invariant
+		(
+   			items := tl items;
+   			priority := 0
+   		)
+   	pre len items <> 0;
+ 	
+ 	-- Increment priority for number of tray steps waiting - called from TrayAllocator
+ 	public IncrementPriority: () ==> ()
+ 	IncrementPriority() ==
+   		priority := priority + 1; -- Increment priority wait counter	
+   	
+   	-- Blocked until items to induct	
+   	ItemsToInduct: () ==> bool
+   	ItemsToInduct () ==
+   		return len items <> 0;		  		
+ 	  
+	functions
+
+	sync
+		-- Ensure mutex access to item sequence
+				
+		-- TrayAllocator and InductionController threads
+		mutex (InductFirstItem);
+		mutex (IncrementPriority);
+		mutex (GetFirstItem, IncrementPriority, InductFirstItem); 
+		
+		-- Block thread if no items to induct 
+		per ItemsToInduct => len items > 0;
+		
+	thread
+	(
+		while (ItemsToInduct()) do
+		(
+		    -- Request tray allocator to induct item and wait for induction
+		    let item = GetFirstItem()
+		    in
+				allocator.RequestTray(threadid, selfIC, item);
+			allocator.Wait();
+
+		    -- Wait time equal InductionRate in tray steps 
+		    -- to keep separation between items
+			-- 
+			SorterEnviroment`trayStep.WaitSteps(InductionRate);
+			
+			--World`timerRef.WaitRelative(InductionRateInMs - 500);
+			--World`timerRef.Awake();
+		);	
+	);
+	traces
+
+end InductionController
