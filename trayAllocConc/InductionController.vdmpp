@@ -62,42 +62,6 @@ class InductionController
 	FeedItem(i) ==
 		items := items ^ [i];
 
-    -- Simulate sorter-ring moved one tray step
-	public TrayStep: () ==> ()
-	TrayStep() ==
-	(
-		-- Induct next item based on InductionRate
-		stepCount := stepCount + 1;
-		if IsItemWaiting() or (stepCount >= InductionRate)
-		then
-		(
-			InductNextItem();
-			stepCount := 0;
-		)
-	);
-
-	-- If next item could be inducted then removed it from the head of item sequence
-	-- If item could not be inducted then increment priority
-    private InductNextItem: () ==> ()
-    InductNextItem() ==
-		-- let n = len items  
-		-- in
-			-- if n > 0
-			-- then
-				let item = hd items
-			  	in
-			  		if allocator.InductItem(self, item)
-			  		then
-			    	(
-						atomic -- Due to invariant
-						(
-			    			items := tl items;
-			    			priority := 0
-			    		);
-			    	)
-			  		else 
-			    		priority := priority + 1; -- Increment priority wait counter			  		
- 
     -- Returns the next item to be inducted
     GetFirstItem: () ==> Item
     GetFirstItem() ==
@@ -128,18 +92,13 @@ class InductionController
 
 	sync
 		-- Ensure mutex access to item sequence
-		
-		-- Enviroment and InductionController threads
-		mutex (FeedItem, InductNextItem);
-		--mutex (FeedItem);
-		
+				
 		-- TrayAllocator and InductionController threads
 		--mutex (InductFirstItem);
 		--mutex (IncrementPriority);
 		mutex (GetFirstItem, IncrementPriority, InductFirstItem); 
 		
 		-- Block thread if no items to induct 
-		per InductNextItem => len items > 0;
 		per ItemsToInduct => len items > 0;
 		
 	thread
@@ -147,34 +106,20 @@ class InductionController
 		while (ItemsToInduct()) do
 		(
 		    -- Request tray allocator to induct item and wait for induction
-			allocator.RequestTray(threadid, selfIC, GetFirstItem());
+		    let item = GetFirstItem()
+		    in
+				allocator.RequestTray(threadid, selfIC, item);
 			allocator.Wait();
 
 		    -- Wait time equal InductionRate in tray steps 
 		    -- to keep separation between items
+			-- 
 			SorterEnviroment`trayStep.WaitSteps(InductionRate);
 			
-			--World`timerRef.WaitRelative(InductionRateInMs);
+			--World`timerRef.WaitRelative(InductionRateInMs - 500);
 			--World`timerRef.Awake();
 		);	
 	);
-		
-	/* Tray Step version
-		while (true) do
-		(
-			-- Induct next item based on InductionRate
-			SorterEnviroment`trayStep.WaitSteps(1);
-			stepCount := stepCount + 1;
-	   		
-			if IsItemWaiting() or (stepCount >= InductionRate)
-			then
-			(
-				InductNextItem();
-		   		--World`timerRef.WaitRelative(InductionRate * someting);
-				stepCount := 0;
-			)
-		);
-	*/
 	traces
 
 end InductionController

@@ -49,7 +49,9 @@ class TrayAllocator
 		twoTrayStrategy : AllocatorTwoTray;	
 		
 		-- Map of waiting inductions with an item to be inducted 
-		itemsToInduct : map nat to (InductionController * Item) := {|->};
+		itemsToInductMap : map nat to (InductionController * Item) := {|->};
+		-- waitingThreads : seq of nat := [];
+		-- inv elems waitingThreads = dom itemsToInductMap;
 						
 	operations
 	
@@ -128,10 +130,6 @@ class TrayAllocator
 			PutItemOnTrays(item, trays \ {t});
 		)
 	pre forall t in set trays & t.IsTrayEmpty();
-	-- 	for all t in set trays
-	--	do
-	--		t.ItemOnTray(item)
-	-- pre trays <> {} and forall t in set trays & t.IsTrayEmpty();
 	
 	-- Returns true if sorter is full
 	public IsSorterFull: () ==> bool
@@ -147,7 +145,7 @@ class TrayAllocator
 	public RequestTray: nat * InductionController * Item ==> ()
 	RequestTray (t, ic, item) ==
 			AddItem(t, ic, item)
-	pre t not in set dom itemsToInduct;
+	pre t not in set dom itemsToInductMap;
 		
     -- Thread blocked until removed from Map waitingICs
 	public Wait: () ==> ()
@@ -156,23 +154,32 @@ class TrayAllocator
     -- Add induction waiting with item to induct
 	AddItem: nat * InductionController * Item ==> ()
 	AddItem (t, ic, item) ==
-			itemsToInduct := itemsToInduct munion {t |-> mk_(ic, item)}
-	pre t not in set dom itemsToInduct;
+	atomic
+	(
+			itemsToInductMap := itemsToInductMap munion {t |-> mk_(ic, item)};
+			-- waitingThreads := waitingThreads ^ [t];
+	)
+	pre t not in set dom itemsToInductMap;
 	
     -- Remove induction waiting with item to induct
 	RemoveItem: nat ==> ()
 	RemoveItem (t) ==
-			itemsToInduct := {t} <-: itemsToInduct
-	pre t in set dom itemsToInduct;
+	atomic 
+	(
+			itemsToInductMap := {t} <-: itemsToInductMap;
+			-- waitingThreads := tl waitingThreads;
+	)
+	pre t in set dom itemsToInductMap;
 	
 	-- Returns 
 	CheckItemsToInduct: () ==> ()
 	CheckItemsToInduct () ==
 	(
 		-- Induct items for all waiting inductions
-		for all t in set dom itemsToInduct
+		/* Version random service */
+		for all t in set dom itemsToInductMap
 		do
-			let mk_(ic, item) = itemsToInduct(t)
+			let mk_(ic, item) = itemsToInductMap(t)
 			in
 				if InductItem(ic, item) then
 				(
@@ -181,6 +188,24 @@ class TrayAllocator
 				)
 				else 
 					ic.IncrementPriority();
+					
+		-- Induct items for all waiting inductions
+		/*
+		if waitingThreads <> [] then
+		for i = 1 to len waitingThreads
+		do
+			let t = waitingThreads(i),
+				mk_(ic, item) = itemsToInductMap(t)
+			in
+				if InductItem(ic, item) then
+				(
+					ic.InductFirstItem();
+					RemoveItem(t);
+				)
+				else 
+					ic.IncrementPriority();
+		*/
+		
 	);
 			
 
@@ -207,13 +232,11 @@ class TrayAllocator
 
 	sync
 
-	-- mutex(InductItem);  -- Only allows one induction at a time to induct items
-
 	mutex(RequestTray);  -- Only allows one induction at a time to induct items
 	-- Mutex to ensure syncronization between InductionController and TrayAllocator
 	mutex(RequestTray, CheckItemsToInduct);
 	-- Permission predicate on Wait operation
-	per Wait => threadid not in set dom itemsToInduct;
+	per Wait => threadid not in set dom itemsToInductMap;
 	
 	thread
 		while (true) do
