@@ -23,7 +23,7 @@ class InductionController
 	
 	operations
 
-    -- InductionController constructor
+    -- InductionController constructors
 	public InductionController: TrayAllocator * nat ==> InductionController
 	InductionController(a, n) ==
 	(
@@ -32,6 +32,17 @@ class InductionController
 		selfIC := self;
 	);
 	
+	public InductionController: nat ==> InductionController
+	InductionController(n) ==
+	(
+		id := n;
+		selfIC := self;
+	);
+
+	public AssignAllocator: TrayAllocator ==> ()
+	AssignAllocator(a) ==
+		allocator := a;
+		
 	-- Returns induction controller UID
 	public GetId: () ==> nat
 	GetId() == 
@@ -94,8 +105,8 @@ class InductionController
 		-- Ensure mutex access to item sequence
 				
 		-- TrayAllocator and InductionController threads
-		--mutex (InductFirstItem);
-		--mutex (IncrementPriority);
+		mutex (InductFirstItem);
+		mutex (IncrementPriority);
 		mutex (GetFirstItem, IncrementPriority, InductFirstItem); 
 		
 		-- Block thread if no items to induct 
