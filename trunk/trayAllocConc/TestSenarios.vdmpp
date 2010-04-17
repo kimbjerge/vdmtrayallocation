@@ -29,6 +29,7 @@ class TestTraces
 	traces
     
     -- To run TestSenarious - IO`print has to be commented out
+    /*
   	TestSenario1: (
   					let loader in set tests
   					in
@@ -41,5 +42,6 @@ class TestTraces
 							)			   		
 					)
 				   );
-
+	*/
+	
 end TestTraces

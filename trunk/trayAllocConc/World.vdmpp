@@ -96,13 +96,7 @@ class World
 			IO`print("---------------------------------------------\n");
 			IO`print("Tray allocation model test #" ^ String`NatToStr(test)^ ": " ^ testfiles(test) ^ "\n");
 			IO`print("---------------------------------------------\n");
-			
-			-- Sequential model
-			-- Performs simulation based on time steps	
-			-- for all t in set {0,...,loader.GetNumTimeSteps()} 
-			-- do 
-			--	env.TimeStep(t);
-			
+						
 			env.isFinished();
 			PrintSimulationResult();
 		);
