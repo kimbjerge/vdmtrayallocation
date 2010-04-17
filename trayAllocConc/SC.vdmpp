@@ -10,24 +10,28 @@ class SC
 	values
 		
 	instance variables
-		public allocator : TrayAllocator;
+		public static ic1 : InductionController := new InductionController(1);
+		public static ic2 : InductionController := new InductionController(2);
+		public static ic3 : InductionController := new InductionController(3);
+		public static inductionGroup : seq of InductionController := [ic1, ic2, ic3];
+		public static allocator : TrayAllocator := new TrayAllocator(inductionGroup);
 	
 	operations
 	
     -- SystemController constructor
-	public SC: SorterEnviroment ==> SC
-	SC(e) ==
+	public SC: () ==> SC
+	SC() ==
 	(
-        allocator := new TrayAllocator(e); 
 	);
-
 	
-	-- Notified each time sorter-ring has moved one tray step
-	public TrayStep: Tray`UID * Tray`State  ==> ()
-	TrayStep(uid, state) ==
+	-- Create assignments releations between objects
+	public CreateAssignments: SorterEnviroment ==> ()
+	CreateAssignments (env) ==
 	(
-		IO`print("Card reader tray id " ^ String`NatToStr(uid) ^ "\n");
-		allocator.CardReader(uid, state);
+		ic1.AssignAllocator(allocator);
+		ic2.AssignAllocator(allocator);
+		ic3.AssignAllocator(allocator);
+        env.AssignInductionGroup(inductionGroup);
 	);
 
 	functions

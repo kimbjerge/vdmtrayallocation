@@ -8,25 +8,24 @@ class SorterEnviroment
 
 	values
 		public Speed	   : nat1 = 2000;  -- Sorter speed mm/sec
-		public Throughput  : nat = 10000;  -- Required items/hour
-				
+		public Throughput  : nat = 10000;  -- Required items/hour		
 				
 	instance variables
-		public sc : SC;
+	    
+	    public static sc : SC := new SC();
+	    public static trayStep : TrayStep := new TrayStep(Speed);    
+	    
 		public inductionGroup : seq of InductionController := [];
 		itemId : nat := 0;
 		itemLoader : [ItemLoader] := nil;
 		busy : bool := true;
-	
-	    public static trayStep : TrayStep := new TrayStep(Speed);    
-				
+					
 	operations
 	
     -- SorterEnviroment constructor
 	public SorterEnviroment: () ==> SorterEnviroment
 	SorterEnviroment() ==
 	(
-		sc := new SC(self);
 	);
 	
     -- Assigning item loader to SorterEnviroment
@@ -59,9 +58,11 @@ class SorterEnviroment
 
 	thread
     (
+        sc.CreateAssignments(World`env);
+        
         -- Start all threads in the system
     	start (trayStep);     	
-		start (sc.allocator);
+		start (SC`allocator);
    		for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do start (inductionGroup(i));
     	 	

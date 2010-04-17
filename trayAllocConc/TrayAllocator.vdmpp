@@ -56,12 +56,11 @@ class TrayAllocator
 	operations
 	
     -- TrayAllocator constructor
-	public TrayAllocator: SorterEnviroment==> TrayAllocator
-	TrayAllocator(e) ==
+	public TrayAllocator: seq of InductionController ==> TrayAllocator
+	TrayAllocator(ig) ==
 	(
 	    sorterRing := {num |-> new Tray(num) | num in set {1,...,NumOfTrays}};
-	    inductionGroup := [new InductionController(self, num) | num in set {1,...,NumOfInductions}];
-        e.AssignInductionGroup(inductionGroup);
+	    inductionGroup := ig;
         
         -- Creating strategies for allocation of one and two tray items
         oneTrayStrategy := new AllocatorOneTray(self);

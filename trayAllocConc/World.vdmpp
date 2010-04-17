@@ -11,6 +11,7 @@ class World
 	instance variables
 	
 		public static env : [SorterEnviroment] := nil;
+		
 		loader : [ItemLoader] := nil;
 		
 		-- Test files that contains test scenarios 
@@ -61,7 +62,7 @@ class World
 		IO`print("----------------------------------------------\n");
 	
 		-- Prints result of simulation
-		let r : TrayAllocator`ThroughputResult = env.sc.allocator.GetThroughput()
+		let r : TrayAllocator`ThroughputResult = SC`allocator.GetThroughput()
 		in
 		(
 			IO`print("Number of trays with items       : " ^ String`NatToStr(r.traysWithItemOnSorter) ^ "\n");
@@ -72,7 +73,7 @@ class World
 		);    
 
 		IO`print("----------------------------------------------\n");
-		if env.sc.allocator.IsSorterFull() = true
+		if SC`allocator.IsSorterFull() = true
 		then
 			IO`print("      ****    Sorter is full   *****\n")
 	    else
