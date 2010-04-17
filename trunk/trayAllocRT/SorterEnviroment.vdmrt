@@ -12,7 +12,7 @@ class SorterEnviroment
 				
 	instance variables
 	    
-	    public static sc : SC := new SC();
+	    -- public static sc : SC := new SC();
 	    public static trayStep : TrayStep := new TrayStep(Speed);    
 	    
 		public inductionGroup : seq of InductionController := [];
@@ -50,6 +50,17 @@ class SorterEnviroment
 	public isFinished : () ==> () 
 	isFinished() == skip;
 	
+	-- Create assignments releations between objects
+	CreateAssignments: () ==> ()
+	CreateAssignments () ==
+	(
+		SC`ic1.AssignAllocator(SC`allocator);
+		SC`ic2.AssignAllocator(SC`allocator);
+		SC`ic3.AssignAllocator(SC`allocator);
+        AssignInductionGroup(SC`inductionGroup);
+	);
+	
+	
 	functions
 
 	sync
@@ -58,7 +69,7 @@ class SorterEnviroment
 
 	thread
     (
-        sc.CreateAssignments(World`env);
+        CreateAssignments();
         
         -- Start all threads in the system
     	start (trayStep);     	
