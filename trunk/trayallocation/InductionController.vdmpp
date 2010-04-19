@@ -130,12 +130,15 @@ class InductionController
 		-- Ensure mutex access to item sequence
 		
 		-- Enviroment and InductionController threads
-		mutex (FeedItem, InductNextItem);
+		--mutex (FeedItem, InductNextItem);
 		--mutex (FeedItem);
 		
+		-- Enviroment and TrayAllocator threads
+		mutex (FeedItem, InductFirstItem);
+		
 		-- TrayAllocator and InductionController threads
-		--mutex (InductFirstItem);
-		--mutex (IncrementPriority);
+		mutex (InductFirstItem);
+		mutex (IncrementPriority);
 		mutex (GetFirstItem, IncrementPriority, InductFirstItem); 
 		
 		-- Block thread if no items to induct 
@@ -154,8 +157,8 @@ class InductionController
 		    -- to keep separation between items
 			SorterEnviroment`trayStep.WaitSteps(InductionRate);
 			
-			--World`timerRef.WaitRelative(InductionRateInMs);
-			--World`timerRef.Awake();
+			-- World`timerRef.WaitRelative(InductionRateInMs);
+			-- World`timerRef.Awake();
 		);	
 	);
 		
