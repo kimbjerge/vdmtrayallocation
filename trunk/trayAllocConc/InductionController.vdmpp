@@ -102,7 +102,8 @@ class InductionController
 	functions
 
 	sync
-		-- Ensure mutex access to item sequence
+		-- Enviroment and TrayAllocator threads
+		mutex (FeedItem, InductFirstItem);
 				
 		-- TrayAllocator and InductionController threads
 		mutex (InductFirstItem);
