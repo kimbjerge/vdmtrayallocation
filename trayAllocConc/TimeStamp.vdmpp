@@ -86,7 +86,7 @@ GetTime: Returns the currentTime.
 public GetTime : () ==> nat
 GetTime() ==
   return currentTime;
-
+  
 \end{vdm_al}
 Awake: Used to sleep threads - will not wake up until threadid is removed from wakeUpMap
 \begin{vdm_al}

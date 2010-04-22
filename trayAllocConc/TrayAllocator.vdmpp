@@ -50,8 +50,6 @@ class TrayAllocator
 		
 		-- Map of waiting inductions with an item to be inducted 
 		itemsToInductMap : map nat to (InductionController * Item) := {|->};
-		-- waitingThreads : seq of nat := [];
-		-- inv elems waitingThreads = dom itemsToInductMap;
 						
 	operations
 	
@@ -153,21 +151,13 @@ class TrayAllocator
     -- Add induction waiting with item to induct
 	AddItem: nat * InductionController * Item ==> ()
 	AddItem (t, ic, item) ==
-	atomic
-	(
-			itemsToInductMap := itemsToInductMap munion {t |-> mk_(ic, item)};
-			-- waitingThreads := waitingThreads ^ [t];
-	)
+			itemsToInductMap := itemsToInductMap munion {t |-> mk_(ic, item)}
 	pre t not in set dom itemsToInductMap;
 	
     -- Remove induction waiting with item to induct
 	RemoveItem: nat ==> ()
 	RemoveItem (t) ==
-	atomic 
-	(
-			itemsToInductMap := {t} <-: itemsToInductMap;
-			-- waitingThreads := tl waitingThreads;
-	)
+			itemsToInductMap := {t} <-: itemsToInductMap
 	pre t in set dom itemsToInductMap;
 	
 	-- Returns 
@@ -175,7 +165,6 @@ class TrayAllocator
 	CheckItemsToInduct () ==
 	(
 		-- Induct items for all waiting inductions
-		/* Version random service */
 		for all t in set dom itemsToInductMap
 		do
 			let mk_(ic, item) = itemsToInductMap(t)
@@ -186,25 +175,7 @@ class TrayAllocator
 					RemoveItem(t);
 				)
 				else 
-					ic.IncrementPriority();
-					
-		-- Induct items for all waiting inductions
-		/*
-		if waitingThreads <> [] then
-		for i = 1 to len waitingThreads
-		do
-			let t = waitingThreads(i),
-				mk_(ic, item) = itemsToInductMap(t)
-			in
-				if InductItem(ic, item) then
-				(
-					ic.InductFirstItem();
-					RemoveItem(t);
-				)
-				else 
-					ic.IncrementPriority();
-		*/
-		
+					ic.IncrementPriority();		
 	);
 			
 
@@ -242,6 +213,7 @@ class TrayAllocator
 		(
 		    -- Wait time equal to one tray step
 			SorterEnviroment`trayStep.WaitSteps(1);
+			
 			CardReader(TrayStep`GetCounts() mod TrayAllocator`NumOfTrays + 1, <Empty>);
 			
 			-- Induct items for all waiting inductions

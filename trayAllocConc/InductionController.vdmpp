@@ -125,10 +125,9 @@ class InductionController
 
 		    -- Wait time equal InductionRate in tray steps 
 		    -- to keep separation between items
-			-- 
 			SorterEnviroment`trayStep.WaitSteps(InductionRate);
 			
-			--World`timerRef.WaitRelative(InductionRateInMs - 500);
+			--World`timerRef.WaitRelative(1200); --InductionRateInMs - 500);
 			--World`timerRef.Awake();
 		);	
 	);
