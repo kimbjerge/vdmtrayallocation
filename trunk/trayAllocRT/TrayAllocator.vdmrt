@@ -50,8 +50,11 @@ class TrayAllocator
 		
 		-- Map of waiting inductions with an item to be inducted 
 		itemsToInductMap : map nat to (InductionController * Item) := {|->};
-		-- waitingThreads : seq of nat := [];
-		-- inv elems waitingThreads = dom itemsToInductMap;
+		public icThreadsWaiting : map nat to nat1 := {|->}; -- Map of thread ids to IC ids
+		inv dom itemsToInductMap = dom icThreadsWaiting;
+		
+		-- Counting number of trays simulated
+		trayCount: nat := 0;
 						
 	operations
 	
@@ -146,27 +149,21 @@ class TrayAllocator
 			AddItem(t, ic, item)
 	pre t not in set dom itemsToInductMap;
 		
-    -- Thread blocked until removed from Map waitingICs
-	public Wait: () ==> ()
-	Wait() == skip;
-
     -- Add induction waiting with item to induct
 	AddItem: nat * InductionController * Item ==> ()
 	AddItem (t, ic, item) ==
-	atomic
-	(
+	atomic (
 			itemsToInductMap := itemsToInductMap munion {t |-> mk_(ic, item)};
-			-- waitingThreads := waitingThreads ^ [t];
+			icThreadsWaiting := icThreadsWaiting munion {t |-> ic.GetId()}
 	)
 	pre t not in set dom itemsToInductMap;
 	
     -- Remove induction waiting with item to induct
 	RemoveItem: nat ==> ()
 	RemoveItem (t) ==
-	atomic 
-	(
+	atomic (
 			itemsToInductMap := {t} <-: itemsToInductMap;
-			-- waitingThreads := tl waitingThreads;
+			icThreadsWaiting := {t} <-: icThreadsWaiting
 	)
 	pre t in set dom itemsToInductMap;
 	
@@ -175,7 +172,6 @@ class TrayAllocator
 	CheckItemsToInduct () ==
 	(
 		-- Induct items for all waiting inductions
-		/* Version random service */
 		for all t in set dom itemsToInductMap
 		do
 			let mk_(ic, item) = itemsToInductMap(t)
@@ -186,28 +182,25 @@ class TrayAllocator
 					RemoveItem(t);
 				)
 				else 
-					ic.IncrementPriority();
-					
-		-- Induct items for all waiting inductions
-		/*
-		if waitingThreads <> [] then
-		for i = 1 to len waitingThreads
-		do
-			let t = waitingThreads(i),
-				mk_(ic, item) = itemsToInductMap(t)
-			in
-				if InductItem(ic, item) then
-				(
-					ic.InductFirstItem();
-					RemoveItem(t);
-				)
-				else 
-					ic.IncrementPriority();
-		*/
-		
+					ic.IncrementPriority();		
 	);
-			
-
+		
+	-- Periodic thread operation that simulates the TrayStep		
+    TrayStep: () ==> ()
+    TrayStep () ==
+    (
+        trayCount := trayCount + 1;
+   	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
+  
+  		CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
+		
+		-- Induct items for all waiting inductions
+		CheckItemsToInduct();
+    );
+ 
+   	WaitTrayStep: () ==> ()	  		
+   	WaitTrayStep () == skip;
+    
 	functions
 
 	-- Calculates the current throughput based on items on sorter ring 
@@ -228,25 +221,39 @@ class TrayAllocator
 			mk_ThroughputResult(itemsOnSorter, twoTrayItemsOnSorter, steps, items, throughput)
 	pre trays <> {};
 	
-
 	sync
 
 	mutex(RequestTray);  -- Only allows one induction at a time to induct items
 	-- Mutex to ensure syncronization between InductionController and TrayAllocator
 	mutex(RequestTray, CheckItemsToInduct);
-	-- Permission predicate on Wait operation
-	per Wait => threadid not in set dom itemsToInductMap;
 	
 	thread
+		--periodic (300, 0, 0, 0) (TrayStep);
+		while (true) do
+		(
+		    -- Wait time equal to one tray step
+	        trayCount := trayCount + 1;
+	   	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
+			
+			CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
+			
+			-- Induct items for all waiting inductions
+			CheckItemsToInduct();
+			duration(300) WaitTrayStep();
+		);
+		
+		/* Concurrent version
 		while (true) do
 		(
 		    -- Wait time equal to one tray step
 			SorterEnviroment`trayStep.WaitSteps(1);
+			
 			CardReader(TrayStep`GetCounts() mod TrayAllocator`NumOfTrays + 1, <Empty>);
 			
 			-- Induct items for all waiting inductions
 			CheckItemsToInduct();
 		);
+		*/
 
 	traces
 
