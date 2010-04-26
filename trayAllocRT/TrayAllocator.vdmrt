@@ -158,9 +158,9 @@ class TrayAllocator
 	)
 	pre t not in set dom itemsToInductMap;
 	
-    -- Remove induction waiting with item to induct
-	RemoveItem: nat ==> ()
-	RemoveItem (t) ==
+    -- Release induction waiting with item to induct
+	ReleaseWaitingIC: nat ==> ()
+	ReleaseWaitingIC (t) ==
 	atomic (
 			itemsToInductMap := {t} <-: itemsToInductMap;
 			icThreadsWaiting := {t} <-: icThreadsWaiting
@@ -179,7 +179,7 @@ class TrayAllocator
 				if InductItem(ic, item) then
 				(
 					ic.InductFirstItem();
-					RemoveItem(t);
+					ReleaseWaitingIC(t);
 				)
 				else 
 					ic.IncrementPriority();		
@@ -189,6 +189,7 @@ class TrayAllocator
     TrayStep: () ==> ()
     TrayStep () ==
     (
+   	    --IO`print("< " ^ String`NatToStr(time) ^ ">>>");
         trayCount := trayCount + 1;
    	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
   
@@ -196,6 +197,7 @@ class TrayAllocator
 		
 		-- Induct items for all waiting inductions
 		CheckItemsToInduct();
+   	    --IO`print("<<< " ^ String`NatToStr(time) ^ ">");
     );
  
    	WaitTrayStep: () ==> ()	  		
@@ -223,12 +225,16 @@ class TrayAllocator
 	
 	sync
 
+	-- mutex(TrayStep);
+	
 	mutex(RequestTray);  -- Only allows one induction at a time to induct items
 	-- Mutex to ensure syncronization between InductionController and TrayAllocator
 	mutex(RequestTray, CheckItemsToInduct);
 	
 	thread
-		--periodic (300, 0, 0, 0) (TrayStep);
+		--
+		periodic (20000, 0, 0, 0) (TrayStep);
+		/*
 		while (true) do
 		(
 		    -- Wait time equal to one tray step
@@ -241,6 +247,7 @@ class TrayAllocator
 			CheckItemsToInduct();
 			duration(300) WaitTrayStep();
 		);
+		*/
 		
 		/* Concurrent version
 		while (true) do
