@@ -137,8 +137,9 @@ class InductionController
 			);
 
     	    --IO`print("( " ^ String`NatToStr(id) ^ ")");
-			
-			duration(600) WaitInductionRate();
+    	    
+			-- In teory this value should be 2x20000 see periodic thread in TrayAllocator
+			duration(30000) WaitInductionRate();
 			
 		    -- Wait time equal InductionRate in tray steps 
 		    -- to keep separation between items
