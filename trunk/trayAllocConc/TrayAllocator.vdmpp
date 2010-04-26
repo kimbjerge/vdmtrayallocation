@@ -154,9 +154,9 @@ class TrayAllocator
 			itemsToInductMap := itemsToInductMap munion {t |-> mk_(ic, item)}
 	pre t not in set dom itemsToInductMap;
 	
-    -- Remove induction waiting with item to induct
-	RemoveItem: nat ==> ()
-	RemoveItem (t) ==
+    -- Release induction waiting with item to induct
+	ReleaseWaitingIC: nat ==> ()
+	ReleaseWaitingIC (t) ==
 			itemsToInductMap := {t} <-: itemsToInductMap
 	pre t in set dom itemsToInductMap;
 	
@@ -172,7 +172,7 @@ class TrayAllocator
 				if InductItem(ic, item) then
 				(
 					ic.InductFirstItem();
-					RemoveItem(t);
+					ReleaseWaitingIC(t);
 				)
 				else 
 					ic.IncrementPriority();		
