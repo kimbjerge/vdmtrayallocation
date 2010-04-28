@@ -69,6 +69,7 @@ class InductionController
 				in item.GetSizeOfTrays();
 		  		
     -- Enviroment feeds a new item on induction
+	async
 	public FeedItem: Item ==> ()
 	FeedItem(i) ==
 		items := items ^ [i];
@@ -102,7 +103,7 @@ class InductionController
    	WaitInductionRate: () ==> ()	  		
    	WaitInductionRate () == skip;
 
-   -- Thread blocked until removed from Map waitingICs
+    -- Thread blocked until removed from Map waitingICs
 	Wait: () ==> ()
 	Wait() == skip;
  	  
@@ -110,6 +111,7 @@ class InductionController
 
 	sync
 		-- Enviroment and TrayAllocator threads
+		mutex (FeedItem); -- Async new mutex needed!
 		mutex (FeedItem, InductFirstItem);
 				
 		-- TrayAllocator and InductionController threads
