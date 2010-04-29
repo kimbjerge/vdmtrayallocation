@@ -13,7 +13,7 @@ system SC
 		cpuIC2 : CPU := new CPU (<FCFS>,1E6);
 		
 		-- cpu to deploy induction controller 3
-		cpuIC3 : CPU := new CPU (<FP>,1E9);
+		cpuIC3 : CPU := new CPU (<FCFS>,1E6);
 		
 		-- cpu to deploy tray allocator 4
 		cpuTA4 : CPU := new CPU (<FCFS>,1E6);

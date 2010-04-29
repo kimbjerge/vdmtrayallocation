@@ -8,7 +8,9 @@ class SorterEnviroment
 
 	values
 		public Speed	   : nat1 = 2000;  -- Sorter speed mm/sec
-		public Throughput  : nat = 10000;  -- Required items/hour		
+		public Throughput  : nat = 10000;  -- Required items/hour
+		public StepMs 	   : nat = 10;
+		public TUinMS      : nat = (StepMs * TrayAllocator`TrayStepTimeUnits) / ((Tray`Size * 1000) / Speed); 	
 				
 	instance variables
 	    
@@ -20,7 +22,8 @@ class SorterEnviroment
 		itemId : nat := 0;
 		itemLoader : [ItemLoader] := nil;
 		busy : bool := true;
-		timeStep : nat := 0;
+		msCount : nat := 0;
+		nextMs : nat := 0;
 					
 	operations
 	
@@ -74,33 +77,37 @@ class SorterEnviroment
         
         -- Start all threads in the system
     	-- start (trayStep);     	
-		--
+
 		start (SC`allocator);
    		for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do start (inductionGroup(i));
-    	 	
+   	    	    	 	
   		while busy do
    		(
- 			timeStep := timeStep + 1;
- 	 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
-			do 
-			(
-				-- Check for item to feed induction at time step
-			 	let size = itemLoader.GetItemAtTimeStep(timeStep, i)
-			 	in
-					if (size > 0)
-					then 
-					(
-			  			itemId := itemId + 1;
-					    IO`print("[ " ^ String`NatToStr(timeStep) ^ "]");
-			  			inductionGroup(i).FeedItem(new Item(size, itemId));
-					);
+   	    	-- IO`print("< " ^ String`NatToStr(time) ^ ">>>");
+   			if (time  > nextMs)
+   			then
+   			(
+		 		nextMs := time + TUinMS;
+	 			msCount := msCount + StepMs;
+	 	 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
+				do 
+				(
+					-- Check for item to feed induction at time step
+				 	let size = itemLoader.GetItemAtTimeStep(msCount, i)
+				 	in
+						if (size > 0)
+						then 
+						(
+				  			itemId := itemId + 1;
+							IO`print("[ " ^ String`NatToStr(msCount) ^ "]");
+				  			inductionGroup(i).FeedItem(new Item(size, itemId));
+						);
+		 		);
 	 		);
-	 		   	 		
-			-- IO`print(String`NatToStr(time));
-
+	 		
             -- Check if simulation is finish
-   			if (time >= itemLoader.GetNumTimeSteps()) then
+   			if (time >= itemLoader.GetNumTimeSteps()*TUinMS) then
    				busy := false;
 
    		);
