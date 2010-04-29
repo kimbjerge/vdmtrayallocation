@@ -18,8 +18,9 @@ class TrayAllocator
 		public InductionSeperation: nat = 2;
 		public NumOfInductions : nat = 3;
 		public NumOfTrays : nat = 20;
-		public SecInHour : nat = 3600 	-- Number of seconds in an hour
-
+		public SecInHour : nat = 3600; 	-- Number of seconds in an hour
+		public TrayStepTimeUnits : nat = 30000 -- Time units used to simulate tray steps 
+		
 	instance variables
 		-- Ensure sufficient number of trays on sorter ring based on inductions and separation
 		inv NumOfTrays > InductionSeperation * NumOfInductions; 
@@ -200,8 +201,6 @@ class TrayAllocator
    	    --IO`print("<<< " ^ String`NatToStr(time) ^ ">");
     );
  
-   	WaitTrayStep: () ==> ()	  		
-   	WaitTrayStep () == skip;
     
 	functions
 
@@ -225,29 +224,14 @@ class TrayAllocator
 	
 	sync
 
-	-- mutex(TrayStep);
-	
 	mutex(RequestTray);  -- Only allows one induction at a time to induct items
 	-- Mutex to ensure syncronization between InductionController and TrayAllocator
 	mutex(RequestTray, CheckItemsToInduct);
 	
 	thread
-		--
-		periodic (20000, 0, 0, 0) (TrayStep);
-		/*
-		while (true) do
-		(
-		    -- Wait time equal to one tray step
-	        trayCount := trayCount + 1;
-	   	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
-			
-			CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
-			
-			-- Induct items for all waiting inductions
-			CheckItemsToInduct();
-			duration(300) WaitTrayStep();
-		);
-		*/
+		-- periodic (30000, 0, 0, 0) (TrayStep);
+		-- Time units to simulate tray steps jitter 5%
+		periodic (30000, 1000, 29000, 0) (TrayStep);
 		
 		/* Concurrent version
 		while (true) do
