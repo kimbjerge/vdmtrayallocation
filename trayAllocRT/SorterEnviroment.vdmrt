@@ -51,7 +51,7 @@ class SorterEnviroment
 	public FeedItemOnInduction: nat * Item ==> ()
 	FeedItemOnInduction(ic, item) ==
 		  inductionGroup(ic).FeedItem(item);
-		
+			
 	public isFinished : () ==> () 
 	isFinished() == skip;
 	
@@ -107,8 +107,11 @@ class SorterEnviroment
 	 		);
 	 		
             -- Check if simulation is finish
-   			if (time >= itemLoader.GetNumTimeSteps()*TUinMS) then
+   			if (time >= itemLoader.GetNumTimeSteps()*(TUinMS/StepMs)) then
+   			(
+   				SC`allocator.StopSimulation();
    				busy := false;
+   			);
 
    		);
 

@@ -56,6 +56,9 @@ class TrayAllocator
 		
 		-- Counting number of trays simulated
 		trayCount: nat := 0;
+		
+		-- Flag to stop simulation
+		busy: bool := true;
 						
 	operations
 	
@@ -185,20 +188,26 @@ class TrayAllocator
 				else 
 					ic.IncrementPriority();		
 	);
+	
+	public StopSimulation: () ==> ()
+	StopSimulation () == busy := false;
 		
 	-- Periodic thread operation that simulates the TrayStep		
     TrayStep: () ==> ()
     TrayStep () ==
     (
-   	    --IO`print("< " ^ String`NatToStr(time) ^ ">>>");
-        trayCount := trayCount + 1;
-   	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
-  
-  		CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
-		
-		-- Induct items for all waiting inductions
-		CheckItemsToInduct();
-   	    --IO`print("<<< " ^ String`NatToStr(time) ^ ">");
+    	if (busy) then
+    	(
+	   	    --IO`print("< " ^ String`NatToStr(time) ^ ">>>");
+	        trayCount := trayCount + 1;
+	   	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
+	  
+	  		CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
+			
+			-- Induct items for all waiting inductions
+			CheckItemsToInduct();
+	   	    --IO`print("<<< " ^ String`NatToStr(time) ^ ">");
+   	    );
     );
  
     
