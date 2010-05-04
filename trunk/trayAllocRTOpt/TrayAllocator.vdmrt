@@ -19,7 +19,7 @@ class TrayAllocator
 		public NumOfInductions : nat = 3;
 		public NumOfTrays : nat = 20;
 		public SecInHour : nat = 3600; 	-- Number of seconds in an hour
-		public TrayStepTimeUnits : nat = 30000 -- Time units used to simulate tray steps 
+		public TrayStepTimeUnits : nat = 12000 -- Time units used to simulate tray steps 
 		
 	instance variables
 		-- Ensure sufficient number of trays on sorter ring based on inductions and separation
@@ -117,7 +117,7 @@ class TrayAllocator
 			    else
 			    ( 
 			    	countItemsInducted := countItemsInducted + 1;
-					IO`print("*Induction id " ^ String`NatToStr(ic.GetId()) ^ "\n");
+					--LogError IO`print("*Induction id " ^ String`NatToStr(ic.GetId()) ^ "\n");
 					-- Assign item to trays
 			    	PutItemOnTrays(item, trays);
 			    	return true;
@@ -200,7 +200,7 @@ class TrayAllocator
     	(
 	   	    --IO`print("< " ^ String`NatToStr(time) ^ ">>>");
 	        trayCount := trayCount + 1;
-	   	    IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
+	   	    --LogError IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
 	  
 	  		CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
 			
@@ -238,8 +238,8 @@ class TrayAllocator
 	mutex(RequestTray, CheckItemsToInduct);
 	
 	thread
-		-- Time units to simulate tray steps jitter 5%
-		periodic (30000, 1000, 29000, 0) (TrayStep);
+		-- Time units to simulate tray steps jitter 0%
+		periodic (12000, 0, 0, 0) (TrayStep);
 		
 	traces
 

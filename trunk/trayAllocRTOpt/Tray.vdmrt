@@ -79,9 +79,9 @@ class Tray
 		);
 		item.AssignItemToTray(self);
 
-		IO`print("-> Item id " ^ String`NatToStr(item.GetId()) ^ 
-		         "size " ^ String`NatToStr(item.GetSize()) ^ 
-		         "on tray id " ^ String`NatToStr(id) ^ "\n");
+		--LogError IO`print("-> Item id " ^ String`NatToStr(item.GetId()) ^ 
+		--                  "size " ^ String`NatToStr(item.GetSize()) ^ 
+		--                  "on tray id " ^ String`NatToStr(id) ^ "\n");
 	)
 	pre state = <Empty> and item = nil;
 		
