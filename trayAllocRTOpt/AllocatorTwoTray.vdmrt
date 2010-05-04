@@ -28,7 +28,7 @@ class AllocatorTwoTray is subclass of AllocatorStrategy
 		pre icid in set inds trayAllocator.inductionGroup;
 
         -- Returns true if higher priority inductions in induction group
-		public InductionsWithHigherPriority: InductionController ==> bool
+		public InductionsWithHigherPriority: Induction ==> bool
 		InductionsWithHigherPriority(ic) ==
 			return exists i in set elems trayAllocator.inductionGroup 
 					        & i.GetId() <> ic.GetId() 

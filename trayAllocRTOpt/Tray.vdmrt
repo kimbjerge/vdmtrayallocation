@@ -79,7 +79,7 @@ class Tray
 		);
 		item.AssignItemToTray(self);
 
-		--LogError IO`print("-> Item id " ^ String`NatToStr(item.GetId()) ^ 
+		--LogError 		IO`print("-> Item id " ^ String`NatToStr(item.GetId()) ^ 
 		--                  "size " ^ String`NatToStr(item.GetSize()) ^ 
 		--                  "on tray id " ^ String`NatToStr(id) ^ "\n");
 	)

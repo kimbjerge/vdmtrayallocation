@@ -1,0 +1,56 @@
+-- ===============================================================================================================
+-- Induction in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+-- ===============================================================================================================
+
+class Induction
+	types
+
+	values
+
+	instance variables
+		priority : nat := 0;	-- priotity of induction, incremented each time wait to induct item
+		id : nat1;				-- Induction ID 
+
+	operations
+	
+	public Induction: nat ==> Induction
+	Induction(i) ==
+	(
+		id := i;
+	);
+
+	-- Returns induction controller UID
+	public GetId: () ==> nat
+	GetId() == 
+		return id;
+	
+	-- Returns priority of induction controller	
+	public GetPriority: () ==> nat
+	GetPriority() == 
+		return priority;
+	
+	-- Returns true if induction is wating with an item
+	public IsItemWaiting: () ==> bool
+	IsItemWaiting() ==
+		return priority > 0;	
+
+ 	-- Increment priority for number of tray steps waiting - called from TrayAllocator
+ 	public IncrementPriority: () ==> ()
+ 	IncrementPriority() ==
+   		priority := priority + 1; -- Increment priority wait counter	
+   	
+   	-- Clear priority when item is inducted	
+   	public ClearPriority: () ==> ()
+   	ClearPriority() ==
+   		priority := 0;
+
+	functions
+
+	sync
+
+	--thread
+
+	traces
+
+end Induction

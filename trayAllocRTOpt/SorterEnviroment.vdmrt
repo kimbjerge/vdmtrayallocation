@@ -9,7 +9,7 @@ class SorterEnviroment
 	values
 		public Speed	   : nat1 = 2000;  -- Sorter speed mm/sec
 		public Throughput  : nat = 10000;  -- Required items/hour
-		public StepMs 	   : nat = 10;
+		public StepMs 	   : nat = 100;
 		public TUinMS      : nat = (StepMs * TrayAllocator`TrayStepTimeUnits) / ((Tray`Size * 1000) / Speed); 	
 				
 	instance variables
@@ -83,7 +83,6 @@ class SorterEnviroment
    			then
    			(
 		 		nextMs := time + TUinMS;
-	 			msCount := msCount + StepMs;
 	 	 	 	for all i in set {1,...,TrayAllocator`NumOfInductions} 
 				do 
 				(
@@ -94,10 +93,11 @@ class SorterEnviroment
 						then 
 						(
 				  			itemId := itemId + 1;
-							IO`print("[ " ^ String`NatToStr(msCount) ^ "]");
+							IO`print("[ " ^ String`NatToStr(msCount) ^ "," ^ String`NatToStr(time) ^ "]\n");
 				  			inductionGroup(i).FeedItem(new Item(size, itemId));
 						);
 		 		);
+	 			msCount := msCount + StepMs;
 	 		);
 	 		
             -- Check if simulation is finish
