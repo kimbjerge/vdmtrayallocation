@@ -238,23 +238,9 @@ class TrayAllocator
 	mutex(RequestTray, CheckItemsToInduct);
 	
 	thread
-		-- periodic (30000, 0, 0, 0) (TrayStep);
 		-- Time units to simulate tray steps jitter 5%
 		periodic (30000, 1000, 29000, 0) (TrayStep);
 		
-		/* Concurrent version
-		while (true) do
-		(
-		    -- Wait time equal to one tray step
-			SorterEnviroment`trayStep.WaitSteps(1);
-			
-			CardReader(TrayStep`GetCounts() mod TrayAllocator`NumOfTrays + 1, <Empty>);
-			
-			-- Induct items for all waiting inductions
-			CheckItemsToInduct();
-		);
-		*/
-
 	traces
 
 end TrayAllocator
