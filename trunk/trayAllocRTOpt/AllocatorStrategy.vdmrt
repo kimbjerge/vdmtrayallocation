@@ -15,7 +15,7 @@ class AllocatorStrategy
 		AllocateTray (-) ==
 			is subclass responsibility;
 		
-		public InductionsWithHigherPriority: InductionController ==> bool
+		public InductionsWithHigherPriority: Induction ==> bool
 		InductionsWithHigherPriority(ic) ==
 			is subclass responsibility;
 			

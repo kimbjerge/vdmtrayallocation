@@ -31,7 +31,7 @@ system SC
 		public static ic2 : InductionController := new InductionController(2);
 		public static ic3 : InductionController := new InductionController(3);
 		public static inductionGroup : seq of InductionController := [ic1, ic2, ic3];
-		public static allocator : TrayAllocator := new TrayAllocator(inductionGroup);
+		public static allocator : TrayAllocator := new TrayAllocator();
 	
 	operations
 	

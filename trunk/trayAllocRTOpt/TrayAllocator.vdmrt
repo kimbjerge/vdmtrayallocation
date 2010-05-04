@@ -19,7 +19,7 @@ class TrayAllocator
 		public NumOfInductions : nat = 3;
 		public NumOfTrays : nat = 20;
 		public SecInHour : nat = 3600; 	-- Number of seconds in an hour
-		public TrayStepTimeUnits : nat = 12000 -- Time units used to simulate tray steps 
+		public TrayStepTimeUnits : nat = 6000 -- Time units used to simulate tray steps 
 		
 	instance variables
 		-- Ensure sufficient number of trays on sorter ring based on inductions and separation
@@ -29,7 +29,7 @@ class TrayAllocator
 		countItemsInducted : nat := 0;  -- Counts the number of items inducted 
 		
 		-- Induction group and invariants 
-		public inductionGroup : seq of InductionController := [];
+		public inductionGroup : seq of Induction := [];
 		inv len inductionGroup = NumOfInductions; 
 		-- Induction id and inds of inductionGroup sequence must be the same
 		inv forall id in set inds inductionGroup & inductionGroup(id).GetId() = id;
@@ -50,7 +50,7 @@ class TrayAllocator
 		twoTrayStrategy : AllocatorTwoTray;	
 		
 		-- Map of waiting inductions with an item to be inducted 
-		itemsToInductMap : map nat to (InductionController * Item) := {|->};
+		itemsToInductMap : map nat to (Induction * Item) := {|->};
 		public icThreadsWaiting : map nat to nat1 := {|->}; -- Map of thread ids to IC ids
 		inv dom itemsToInductMap = dom icThreadsWaiting;
 		
@@ -63,11 +63,11 @@ class TrayAllocator
 	operations
 	
     -- TrayAllocator constructor
-	public TrayAllocator: seq of InductionController ==> TrayAllocator
-	TrayAllocator(ig) ==
+	public TrayAllocator: () ==> TrayAllocator
+	TrayAllocator() ==
 	(
 	    sorterRing := {num |-> new Tray(num) | num in set {1,...,NumOfTrays}};
-	    inductionGroup := ig;
+	    inductionGroup := [new Induction(id) | id in set {1,...,NumOfInductions}];
         
         -- Creating strategies for allocation of one and two tray items
         oneTrayStrategy := new AllocatorOneTray(self);
@@ -75,22 +75,19 @@ class TrayAllocator
 	);
 
     -- Simulate sorter-ring moved one tray step
-	public CardReader: Tray`UID * Tray`State  ==> ()
-	CardReader(uid, state) ==
+	public CardReader: Tray`UID  ==> ()
+	CardReader(uid) ==
 	(
 	   	-- Update current tray at card reader
 	    trayAtCardReader := uid;
 	    
-	    -- Simulate change of Tray state !!!
-	    -- sorterRing(trayAtCardReader).SetState(state);
-	 	
 	 	-- Count the number of tray steps 
 		countTraySteps := countTraySteps + 1;
 	)
 	pre uid in set dom sorterRing;
 	
 	-- Inducting item on sorter if empty trays and no higher induction priority
-	public InductItem: InductionController * Item ==> bool
+	public InductItem: Induction * Item ==> bool
 	InductItem(ic, item) ==
 	(
 		dcl strategy : AllocatorStrategy;
@@ -148,13 +145,15 @@ class TrayAllocator
 		CalculateThroughput(countTraySteps, rng sorterRing, countItemsInducted);
 	 
 	-- Called by InductionController thread requesting to induct item
-	public RequestTray: nat * InductionController * Item ==> ()
-	RequestTray (t, ic, item) ==
-			AddItem(t, ic, item)
+	public RequestTray: nat * nat * Item ==> ()
+	RequestTray (t, icid, item) ==
+	let ic = inductionGroup(icid)
+	in
+		AddItem(t, ic, item)
 	pre t not in set dom itemsToInductMap;
 		
     -- Add induction waiting with item to induct
-	AddItem: nat * InductionController * Item ==> ()
+	AddItem: nat * Induction * Item ==> ()
 	AddItem (t, ic, item) ==
 	atomic (
 			itemsToInductMap := itemsToInductMap munion {t |-> mk_(ic, item)};
@@ -182,7 +181,7 @@ class TrayAllocator
 			in
 				if InductItem(ic, item) then
 				(
-					ic.InductFirstItem();
+					ic.ClearPriority();
 					ReleaseWaitingIC(t);
 				)
 				else 
@@ -198,15 +197,15 @@ class TrayAllocator
     (
     	if (busy) then
     	(
-	   	    --IO`print("< " ^ String`NatToStr(time) ^ ">>>");
+	   	    -- IO`print("< " ^ String`NatToStr(time) ^ ">>>");
 	        trayCount := trayCount + 1;
 	   	    --LogError IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
 	  
-	  		CardReader(trayCount mod TrayAllocator`NumOfTrays + 1, <Empty>);
+	  		CardReader(trayCount mod TrayAllocator`NumOfTrays + 1);
 			
 			-- Induct items for all waiting inductions
 			CheckItemsToInduct();
-	   	    --IO`print("<<< " ^ String`NatToStr(time) ^ ">");
+	   	    -- IO`print("<<< " ^ String`NatToStr(time) ^ ">");
    	    );
     );
  
@@ -239,7 +238,7 @@ class TrayAllocator
 	
 	thread
 		-- Time units to simulate tray steps jitter 0%
-		periodic (12000, 0, 0, 0) (TrayStep);
+		periodic (6000, 0, 0, 0) (TrayStep);
 		
 	traces
 
