@@ -31,10 +31,7 @@ class World
         */
         
 	    testfiles : seq of seq1 of char := [testfile1];
-	    
-	    -- Concurrent version
-	    -- public static timerRef : TimeStamp := new TimeStamp();    
-	    
+	    	    
 	operations
 	
    -- World constructor

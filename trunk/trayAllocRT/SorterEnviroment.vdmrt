@@ -13,11 +13,7 @@ class SorterEnviroment
 		public TUinMS      : nat = (StepMs * TrayAllocator`TrayStepTimeUnits) / ((Tray`Size * 1000) / Speed); 	
 				
 	instance variables
-	    
-	    -- Concurrent version
-	    -- public static sc : SC := new SC();
-	    -- public static trayStep : TrayStep := new TrayStep(Speed);    
-	    
+	    	    
 		public inductionGroup : seq of InductionController := [];
 		itemId : nat := 0;
 		itemLoader : [ItemLoader] := nil;
@@ -76,8 +72,6 @@ class SorterEnviroment
         CreateAssignments();
         
         -- Start all threads in the system
-    	-- start (trayStep);     	
-
 		start (SC`allocator);
    		for all i in set {1,...,TrayAllocator`NumOfInductions} 
 		do start (inductionGroup(i));

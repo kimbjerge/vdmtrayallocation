@@ -8,14 +8,12 @@ class InductionController
 
 	values
 		public InductionRate : nat = 2;    	-- minimum trays between each item
-		--public InductionRateInMs : nat = (InductionRate * Tray`Size * 1000) / SorterEnviroment`Speed; -- [mm] / [mm/msec]
 
 	instance variables		
 		priority : nat := 0;				-- priotity of induction, incremented each time wait to induct item
 		id : nat1;							-- Induction ID 
 		allocator : TrayAllocator; 			-- TrayAllocator
 		items : seq of Item := [];			-- set of items ready to be inducted
-		--stepCount: nat := 0; 				-- Counts the number of steps between inducting items
 		selfIC : InductionController;
 	
 		-- If induction is waiting there must be items in sequence
@@ -73,7 +71,8 @@ class InductionController
 	public FeedItem: Item ==> ()
 	FeedItem(i) ==
 	(
-		duration (100) items := items ^ [i];
+		duration (100) 
+		items := items ^ [i];
 		--IO`print("[ " ^ String`NatToStr(time) ^ "]");
 	);	
 
@@ -149,15 +148,7 @@ class InductionController
 
     	    --IO`print("( " ^ String`NatToStr(id) ^ ")");
     	    
-			-- In teory this value should be 2x20000 see periodic thread in TrayAllocator
 			BusyWait(TrayAllocator`TrayStepTimeUnits*InductionRate);			
-			
-		    -- Wait time equal InductionRate in tray steps 
-		    -- to keep separation between items
-			--SorterEnviroment`trayStep.WaitSteps(InductionRate);
-			
-			--World`timerRef.WaitRelative(1200); --InductionRateInMs - 500);
-			--World`timerRef.Awake();
 		);	
 	);
 
