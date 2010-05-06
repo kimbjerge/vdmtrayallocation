@@ -11,6 +11,12 @@ system SC
 		
 		-- cpu to deploy induction controller 2
 		cpuIC2 : CPU := new CPU (<FCFS>,1E6);
+
+		-- cpu to deploy induction controller 3
+		cpuIC3 : CPU := new CPU (<FCFS>,1E6);
+		
+		-- cpu to deploy induction controller 4
+		cpuIC4 : CPU := new CPU (<FCFS>,1E6);
 				
 		-- cpu to deploy tray allocator 4
 		cpuTA4 : CPU := new CPU (<FCFS>,1E6);
@@ -20,6 +26,12 @@ system SC
 		
 		-- bus to connect induction controller 2 to the tray allocator
 		bus2 : BUS := new BUS (<FCFS>,1E3,{cpuIC2,cpuTA4});
+
+		-- bus to connect induction controller 3 to the tray allocator
+		bus3 : BUS := new BUS (<FCFS>,1E3,{cpuIC3,cpuTA4});
+
+		-- bus to connect induction controller 4 to the tray allocator
+		bus4 : BUS := new BUS (<FCFS>,1E3,{cpuIC4,cpuTA4});
 
 		public static ic1 : InductionController := new InductionController(1);
 		public static ic2 : InductionController := new InductionController(2);
@@ -39,13 +51,13 @@ system SC
 	   cpuIC1.deploy(ic1);
 
 	   -- set-up ic2
-	   cpuIC1.deploy(ic2);
+	   cpuIC2.deploy(ic2);
 
 	   -- set-up ic3
-	   cpuIC2.deploy(ic3);
+	   cpuIC3.deploy(ic3);
 
 	   -- set-up ic4
-	   cpuIC2.deploy(ic4);
+	   cpuIC4.deploy(ic4);
 
 	   -- set-up tray allocator
 	   cpuTA4.deploy(allocator);
@@ -53,3 +65,4 @@ system SC
 	);	
 
 end SC
+
