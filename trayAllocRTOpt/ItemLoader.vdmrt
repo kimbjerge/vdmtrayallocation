@@ -16,7 +16,7 @@ class ItemLoader
 		io : IO := new IO(); 
 		
 		-- Test with mix of 1 and 2 tray items 
-	    inlines  : seq of inline := [mk_(0,1,100), --  mk_(timeStep, icid, itemSize)
+	    inlines  : seq of inline := [mk_(0,1,100),
         							 mk_(0,2,800),
         							 mk_(0,3,200),
         							 mk_(2,1,200),
@@ -63,7 +63,8 @@ class ItemLoader
 	public GetItemAtTimeStep : nat * nat1 ==> nat
 	GetItemAtTimeStep(timeStep, icid) ==
 	(
-		let elm = {e | e in set elems inlines & e.#1 = timeStep and e.#2 = icid}
+		let elm = {e | e in set elems inlines & e.#1 = timeStep 
+		               and e.#2 = icid}
 		in
 	 		if elm = {}
 	 		then return 0

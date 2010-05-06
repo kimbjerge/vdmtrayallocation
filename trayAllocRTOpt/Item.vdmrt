@@ -57,7 +57,7 @@ class Item
 	AssignItemToTray(tray) ==
 		trays := trays union {tray};
 
-	-- Release item from sorter ring - Implicit operation - not used yet !!!
+	-- Release item from sorter ring - Implicit operation
 	public ReleaseItemFromTrays ()
 	ext wr trays : set of Tray
 	post trays = {}; 

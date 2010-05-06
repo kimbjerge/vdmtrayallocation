@@ -19,7 +19,8 @@ class AllocatorTwoTray is subclass of AllocatorStrategy
 		public AllocateTray: nat ==> set of Tray
 		AllocateTray (icid) ==
 			let posTray = InductionOffset(trayAllocator.trayAtCardReader, icid),
-			    posTrayNext = if (posTray - 1) = 0 then TrayAllocator`NumOfTrays else posTray - 1
+			    posTrayNext = if (posTray - 1) = 0 then 
+			    TrayAllocator`NumOfTrays else posTray - 1
 			in 
 				if trayAllocator.sorterRing(posTray).IsTrayEmpty() and
 				   trayAllocator.sorterRing(posTrayNext).IsTrayEmpty()

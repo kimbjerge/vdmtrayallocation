@@ -28,11 +28,11 @@ class InductionController
 					  		
     -- Enviroment feeds a new item on induction
 	async
-	public FeedItem: Item ==> ()
-	FeedItem(i) ==
+	public FeedItem: nat * nat ==> ()
+	FeedItem(icid, size) ==
 	(
 		--duration (100) 
-		items := items ^ [i];
+		   items := items ^ [new Item(icid, size)];
 	);	
 
     -- Returns the next item to be inducted
@@ -77,7 +77,7 @@ class InductionController
 
 	sync
 		-- Enviroment and TrayAllocator threads
-		mutex (FeedItem); -- Async new mutex needed!
+		mutex (FeedItem);
 		mutex (FeedItem, InductFirstItem);
 		mutex (WaitInductItem);
 								
