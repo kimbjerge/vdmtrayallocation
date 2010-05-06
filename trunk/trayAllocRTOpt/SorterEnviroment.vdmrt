@@ -1,7 +1,7 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- SorterEnvironment in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class SorterEnviroment
 	types
@@ -10,7 +10,8 @@ class SorterEnviroment
 		public Speed	   : nat1 = 2000;  -- Sorter speed mm/sec
 		public Throughput  : nat = 10000;  -- Required items/hour
 		public StepMs 	   : nat = 100;
-		public TUinMS      : nat = (StepMs * TrayAllocator`TrayStepTimeUnits) / ((Tray`Size * 1000) / Speed); 	
+		public TUinMS      : nat = (StepMs * TrayAllocator`TrayStepTimeUnits) 
+		                            / ((Tray`Size * 1000) / Speed); 	
 				
 	instance variables
 	    	    
@@ -55,6 +56,7 @@ class SorterEnviroment
 	CreateAssignments: () ==> ()
 	CreateAssignments () ==
 	(
+        --SC`allocator.CreateAllocatorObjs();
 		SC`ic1.AssignAllocator(SC`allocator);
 		SC`ic2.AssignAllocator(SC`allocator);
 		SC`ic3.AssignAllocator(SC`allocator);
@@ -93,7 +95,8 @@ class SorterEnviroment
 						then 
 						(
 				  			itemId := itemId + 1;
-							IO`print("[ " ^ String`NatToStr(msCount) ^ "," ^ String`NatToStr(time) ^ "]\n");
+							IO`print("[ " ^ String`NatToStr(msCount) 
+							^ "," ^ String`NatToStr(time) ^ "]\n");
 				  			inductionGroup(i).FeedItem(new Item(size, itemId));
 						);
 		 		);
