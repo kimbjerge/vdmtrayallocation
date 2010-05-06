@@ -92,7 +92,10 @@ class SorterEnviroment
 						(
 				  			itemId := itemId + 1;
 							IO`print("[ " ^ String`NatToStr(msCount) 
-							^ "," ^ String`NatToStr(time) ^ "]\n");
+							^ ", " ^ String`NatToStr(itemId) 
+							^ ", " ^ String`NatToStr(size) 
+							^ ", " ^ String`NatToStr(time) 
+							^ "]\n");
 				  			inductionGroup(i).FeedItem(size, itemId);
 						);
 		 		);
