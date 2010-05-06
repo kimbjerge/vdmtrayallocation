@@ -1,0 +1,41 @@
+-- ===========================================================================
+-- AllocatorTwoTray in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+-- (strategy pattern)
+-- ===========================================================================
+
+class AllocatorTwoTray is subclass of AllocatorStrategy
+
+	operations
+		
+		-- AllocatorTwoTray constructor
+		public AllocatorTwoTray: TrayAllocator==> AllocatorTwoTray
+		AllocatorTwoTray(ta) ==
+		(
+			trayAllocator := ta;
+		);
+	
+		-- Allocates trays if empty at induction offset and offset + 1
+		public AllocateTray: nat ==> set of Tray
+		AllocateTray (icid) ==
+			let posTray = InductionOffset(trayAllocator.trayAtCardReader, icid),
+			    posTrayNext = if (posTray - 1) = 0 then 
+			    TrayAllocator`NumOfTrays else posTray - 1
+			in 
+				if trayAllocator.sorterRing(posTray).IsTrayEmpty() and
+				   trayAllocator.sorterRing(posTrayNext).IsTrayEmpty()
+				then return {trayAllocator.sorterRing(posTray), 
+				             trayAllocator.sorterRing(posTrayNext)}
+				else return {}
+		pre icid in set inds trayAllocator.inductionGroup;
+
+        -- Returns true if higher priority inductions in induction group
+		public InductionsWithHigherPriority: Induction ==> bool
+		InductionsWithHigherPriority(ic) ==
+			return exists i in set elems trayAllocator.inductionGroup 
+					        & i.GetId() <> ic.GetId() 
+					        and i.GetPriority() > ic.GetPriority()
+		pre ic in set elems trayAllocator.inductionGroup;
+
+
+end AllocatorTwoTray
