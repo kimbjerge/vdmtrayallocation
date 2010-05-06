@@ -1,7 +1,7 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- Induction in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class Induction
 	types
@@ -9,7 +9,7 @@ class Induction
 	values
 
 	instance variables
-		priority : nat := 0;	-- priotity of induction, incremented each time wait to induct item
+		priority : nat := 0;	-- priotity of induction
 		id : nat1;				-- Induction ID 
 
 	operations
@@ -35,7 +35,7 @@ class Induction
 	IsItemWaiting() ==
 		return priority > 0;	
 
- 	-- Increment priority for number of tray steps waiting - called from TrayAllocator
+ 	-- Increment priority for number of tray steps waiting
  	public IncrementPriority: () ==> ()
  	IncrementPriority() ==
    		priority := priority + 1; -- Increment priority wait counter	

@@ -1,7 +1,7 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- TrayAllocator in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class TrayAllocator
 
@@ -18,11 +18,12 @@ class TrayAllocator
 		public InductionSeperation: nat = 2;
 		public NumOfInductions : nat = 3;
 		public NumOfTrays : nat = 20;
-		public SecInHour : nat = 3600; 	-- Number of seconds in an hour
-		public TrayStepTimeUnits : nat = 6000 -- Time units used to simulate tray steps 
+		public SecInHour : nat = 3600; 		  -- Number of seconds in an hour
+		public TrayStepTimeUnits : nat = 6000 -- Used to simulate tray steps 
 		
 	instance variables
-		-- Ensure sufficient number of trays on sorter ring based on inductions and separation
+		-- Ensure sufficient number of trays on sorter ring 
+		-- based on inductions and separation
 		inv NumOfTrays > InductionSeperation * NumOfInductions; 
 
 		countTraySteps : nat := 0;  	-- Used for calculation of throughput
@@ -30,13 +31,14 @@ class TrayAllocator
 		
 		-- Induction group and invariants 
 		public inductionGroup : seq of Induction := [];
-		inv len inductionGroup = NumOfInductions; 
+		inv inductionGroup <> [] => len inductionGroup = NumOfInductions; 
 		-- Induction id and inds of inductionGroup sequence must be the same
-		inv forall id in set inds inductionGroup & inductionGroup(id).GetId() = id;
+		inv forall id in set inds inductionGroup 
+					& inductionGroup(id).GetId() = id;
 			
 		-- Sorter ring and invariants	
-		public sorterRing : inmap Tray`UID to Tray;
-		inv card dom sorterRing = NumOfTrays;
+		public sorterRing : inmap Tray`UID to Tray := {|->};
+		inv sorterRing <> {|->} => card dom sorterRing = NumOfTrays;
 		-- Tray id and dom of sorterRing map must be the same
 		inv forall id in set dom sorterRing & sorterRing(id).GetId() = id;
 		
@@ -46,12 +48,13 @@ class TrayAllocator
 		inv trayAtCardReader <> nil  => trayAtCardReader in set dom sorterRing;
 		
 		-- Allocation "strategy pattern" for one and two tray items
-		oneTrayStrategy : AllocatorOneTray;
-		twoTrayStrategy : AllocatorTwoTray;	
+		oneTrayStrategy : [AllocatorOneTray] := nil;
+		twoTrayStrategy : [AllocatorTwoTray] := nil;	
 		
 		-- Map of waiting inductions with an item to be inducted 
 		itemsToInductMap : map nat to (Induction * Item) := {|->};
-		public icThreadsWaiting : map nat to nat1 := {|->}; -- Map of thread ids to IC ids
+		-- Map of thread ids to IC ids
+		public icThreadsWaiting : map nat to nat1 := {|->}; 
 		inv dom itemsToInductMap = dom icThreadsWaiting;
 		
 		-- Counting number of trays simulated
@@ -66,6 +69,12 @@ class TrayAllocator
 	public TrayAllocator: () ==> TrayAllocator
 	TrayAllocator() ==
 	(
+		CreateAllocatorObjs();
+	);
+
+	public CreateAllocatorObjs: () ==> ()
+	CreateAllocatorObjs() ==
+	(
 	    sorterRing := {num |-> new Tray(num) | num in set {1,...,NumOfTrays}};
 	    inductionGroup := [new Induction(id) | id in set {1,...,NumOfInductions}];
         
@@ -73,7 +82,7 @@ class TrayAllocator
         oneTrayStrategy := new AllocatorOneTray(self);
         twoTrayStrategy := new AllocatorTwoTray(self);
 	);
-
+	
     -- Simulate sorter-ring moved one tray step
 	public CardReader: Tray`UID  ==> ()
 	CardReader(uid) ==
@@ -101,7 +110,7 @@ class TrayAllocator
 			end;
 		
 		-- Central part of the Tray allocation algorithm 
-		-- Look for inductions with higher priority before allocation of empty trays
+		-- Look for inductions with higher priority
 		if strategy.InductionsWithHigherPriority(ic)
 		then
 		 	return false
@@ -120,7 +129,8 @@ class TrayAllocator
 			    	return true;
 			    ) 
 	)
-	pre ic in set elems inductionGroup and item.GetSizeOfTrays() <= 2;  -- To be changed if Tray`ItemMaxTrays is increased
+	pre ic in set elems inductionGroup and item.GetSizeOfTrays() <= 2;  
+	-- To be changed if Tray`ItemMaxTrays is increased
 	
 	-- Assign item on empty trays 
 	private PutItemOnTrays: Item * set of Tray ==> ()
@@ -150,6 +160,9 @@ class TrayAllocator
 	let ic = inductionGroup(icid)
 	in
 		AddItem(t, ic, item)
+	-- pre exists ic in set elems inductionGroup & ic.GetId() = icid 
+	-- pre icid in set inds inductionGroup
+	--    and t not in set dom itemsToInductMap;
 	pre t not in set dom itemsToInductMap;
 		
     -- Add induction waiting with item to induct
@@ -196,8 +209,8 @@ class TrayAllocator
     TrayStep () ==
     (
     	if (busy) then
-    	(
-	   	    -- IO`print("< " ^ String`NatToStr(time) ^ ">>>");
+    	(   	    
+	   	    --IO`print("< " ^ String`NatToStr(time) ^ ">>>");
 	        trayCount := trayCount + 1;
 	   	    --LogError IO`print("< " ^ String`NatToStr(trayCount) ^ ">");
 	  
@@ -205,7 +218,7 @@ class TrayAllocator
 			
 			-- Induct items for all waiting inductions
 			CheckItemsToInduct();
-	   	    -- IO`print("<<< " ^ String`NatToStr(time) ^ ">");
+	   	    --IO`print("<<< " ^ String`NatToStr(time) ^ ">");
    	    );
     );
  
@@ -224,7 +237,7 @@ class TrayAllocator
 			traysWithItems = {twi | twi in set trays & twi.IsTrayFull()},
 			traysWith2Items = {tw2i | tw2i in set traysWithItems & tw2i.GetItem() <> nil and tw2i.GetItem().GetSizeOfTrays() = 2},
 			itemsOnSorter = card traysWithItems, 
-			twoTrayItemsOnSorter = card traysWith2Items,
+			twoTrayItemsOnSorter = card traysWith2Items / 2,
 			throughput = itemsOnSorter * SecInHour/runTime
 		in 
 			mk_ThroughputResult(itemsOnSorter, twoTrayItemsOnSorter, steps, items, throughput)

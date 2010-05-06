@@ -1,7 +1,7 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- InductionController in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class InductionController
 	types
@@ -33,7 +33,6 @@ class InductionController
 	(
 		--duration (100) 
 		items := items ^ [i];
-		--IO`print("[ " ^ String`NatToStr(time) ^ "]");
 	);	
 
     -- Returns the next item to be inducted
@@ -42,7 +41,7 @@ class InductionController
     	return hd items
     pre len items <> 0;
     
-    -- Removes the first item in sequence and clear priority - called from TrayAllocator
+    -- Removes the first item in sequence and clear priority
  	public InductFirstItem: () ==> ()
  	InductFirstItem() ==
  		items := tl items
@@ -56,48 +55,39 @@ class InductionController
     -- Thread blocked until removed from Map waitingICs
 	Wait: () ==> ()
 	Wait() == skip;
+	 	
+ 	async
+ 	WaitInductItem: () ==> ()
+ 	WaitInductItem() ==
+ 	    -- Request tray allocator to induct item and wait for induction
+	    let item = GetFirstItem()
+	    in
+	    (
+			allocator.RequestTray(threadid, id, item);
+			Wait();
+			InductFirstItem();
+		);
+
+	InductStep: () ==> ()
+	InductStep() ==
+		if (ItemsToInduct()) then
+			WaitInductItem();
 	
-	-- Wait busy on a specified time
-	BusyWait: nat ==> ()
-	BusyWait (t) ==
-		let waitTime = time + t
-		in 
-			while (time < waitTime) do ();
- 	  
 	functions
 
 	sync
 		-- Enviroment and TrayAllocator threads
-		-- mutex (FeedItem); -- Async new mutex needed!
-		per FeedItem => #active(FeedItem) = 0; -- Equal to mutex
+		mutex (FeedItem); -- Async new mutex needed!
 		mutex (FeedItem, InductFirstItem);
-						
-		-- Block thread if no items to induct 
-		per ItemsToInduct => len items > 0;
-		
+		mutex (WaitInductItem);
+								
 		-- Permission predicate on Wait operation
 	    per Wait => threadid not in set dom allocator.icThreadsWaiting;
 		
 	thread
-	(
-   	    --IO`print("( " ^ String`NatToStr(id) ^ ")");
-		while (ItemsToInduct()) do
-		(
-		    -- Request tray allocator to induct item and wait for induction
-		    let item = GetFirstItem()
-		    in
-		    (
-				allocator.RequestTray(threadid, id, item);
-				Wait();
-				InductFirstItem();
-			);
-
-    	    --IO`print("( " ^ String`NatToStr(id) ^ ")");
-    	    
-			BusyWait(TrayAllocator`TrayStepTimeUnits*InductionRate);			
-		);	
-	);
-
+		-- Time units should be TrayAllocator`TrayStepTimeUnits*InductionRate
+		periodic (12000, 0, 0, 0) (InductStep);
+	
 	traces
 
 end InductionController
