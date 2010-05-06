@@ -68,7 +68,7 @@ class TrayAllocator
 	public TrayAllocator: () ==> TrayAllocator
 	TrayAllocator() ==
 	(
-		-- CreateAllocatorObjs();
+		CreateAllocatorObjs();
 	);
 
 	public CreateAllocatorObjs: () ==> ()

@@ -51,7 +51,7 @@ class SorterEnviroment
 	CreateAssignments: () ==> ()
 	CreateAssignments () ==
 	(
-        SC`allocator.CreateAllocatorObjs();
+        -- SC`allocator.CreateAllocatorObjs();
 		SC`ic1.AssignAllocator(SC`allocator);
 		SC`ic2.AssignAllocator(SC`allocator);
 		SC`ic3.AssignAllocator(SC`allocator);
