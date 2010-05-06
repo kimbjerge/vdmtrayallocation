@@ -55,6 +55,7 @@ class SorterEnviroment
 		SC`ic1.AssignAllocator(SC`allocator);
 		SC`ic2.AssignAllocator(SC`allocator);
 		SC`ic3.AssignAllocator(SC`allocator);
+		SC`ic4.AssignAllocator(SC`allocator);
         AssignInductionGroup(SC`inductionGroup);
 	);
 		
