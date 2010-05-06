@@ -107,7 +107,7 @@ class World
 			start(env); -- Start thread in enviroment
 			
 			IO`print("---------------------------------------------\n");
-			IO`print("Tray allocation model test #" ^ String`NatToStr(test)
+			IO`print("Tray allocation RTD2 model #" ^ String`NatToStr(test)
 			^ ": " ^ testfiles(test) ^ "\n");
 			IO`print("---------------------------------------------\n");
 						
