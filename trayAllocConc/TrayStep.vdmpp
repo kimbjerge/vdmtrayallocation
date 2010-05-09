@@ -1,10 +1,15 @@
+-- ===========================================================================
+-- TrayStep in tray allocation for a sortation system
+-- By José Antonio Esparza and Kim Bjerge - spring 2010
+-- ===========================================================================
+
 class TrayStep
 
 instance variables
 
 	public static stepTime : int := -1; 	   -- Time it takes to move a tray in ms
-	public static counts : nat := 0;		   -- Counting number of tray steps simulation running
-	waitTrayStepMap : map nat to nat := {|->}; -- Map of waiting threads to tray step count
+	public static counts : nat := 0;		   -- Counting number of tray steps
+	waitTrayStepMap : map nat to nat := {|->}; -- Map waiting threads to tray step count
 
 operations
 
@@ -40,7 +45,8 @@ operations
  	-- Notifies waiting threads if TraySteps passed	
  	NotifyWatingThreads : () ==> ()
 	NotifyWatingThreads() ==
-  	let threadSet : set of nat = {th | th in set dom waitTrayStepMap & waitTrayStepMap(th) <= counts }
+  	let threadSet : set of nat = {th | th in set dom waitTrayStepMap & 
+  	                                   waitTrayStepMap(th) <= counts }
   	in
     	for all t in set threadSet 
     	do
@@ -55,8 +61,9 @@ operations
 sync
 	per Wait => threadid not in set dom waitTrayStepMap;
 	
-	-- mutex(GetCounts, IncCounts);			  -- Block reading counter while incrementing
-	-- Causes error when added!!!
+	-- Block reading counter while incrementing
+	-- mutex(GetCounts, IncCounts);			
+	-- Causes error when added
 	
 thread 
 

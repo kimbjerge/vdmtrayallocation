@@ -1,7 +1,7 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- SorterEnvironment in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class SorterEnviroment
 	types
@@ -79,7 +79,7 @@ class SorterEnviroment
 					then 
 					(
 			  			itemId := itemId + 1;
-					    --IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
+	  	         --IO`print("[ " ^ String`NatToStr(World`timerRef.GetTime()) ^ "]");
 			  			inductionGroup(i).FeedItem(new Item(size, itemId));
 					);
 	 		);

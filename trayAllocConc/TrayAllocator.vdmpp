@@ -1,7 +1,7 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- TrayAllocator in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class TrayAllocator
 
@@ -21,7 +21,8 @@ class TrayAllocator
 		public SecInHour : nat = 3600 	-- Number of seconds in an hour
 
 	instance variables
-		-- Ensure sufficient number of trays on sorter ring based on inductions and separation
+		-- Ensure sufficient number of trays on sorter ring 
+		-- based on inductions and separation
 		inv NumOfTrays > InductionSeperation * NumOfInductions; 
 
 		countTraySteps : nat := 0;  	-- Used for calculation of throughput
@@ -31,7 +32,8 @@ class TrayAllocator
 		public inductionGroup : seq of InductionController := [];
 		inv len inductionGroup = NumOfInductions; 
 		-- Induction id and inds of inductionGroup sequence must be the same
-		inv forall id in set inds inductionGroup & inductionGroup(id).GetId() = id;
+		inv forall id in set inds inductionGroup & 
+		             inductionGroup(id).GetId() = id;
 			
 		-- Sorter ring and invariants	
 		public sorterRing : inmap Tray`UID to Tray;
@@ -95,7 +97,8 @@ class TrayAllocator
 			end;
 		
 		-- Central part of the Tray allocation algorithm 
-		-- Look for inductions with higher priority before allocation of empty trays
+		-- Look for inductions with higher priority 
+		-- before allocation of empty trays
 		if strategy.InductionsWithHigherPriority(ic)
 		then
 		 	return false
@@ -114,7 +117,8 @@ class TrayAllocator
 			    	return true;
 			    ) 
 	)
-	pre ic in set elems inductionGroup and item.GetSizeOfTrays() <= 2;  -- To be changed if Tray`ItemMaxTrays is increased
+	pre ic in set elems inductionGroup and item.GetSizeOfTrays() <= 2;
+    -- To be changed if Tray`ItemMaxTrays is increased
 	
 	-- Assign item on empty trays 
 	private PutItemOnTrays: Item * set of Tray ==> ()
@@ -133,7 +137,8 @@ class TrayAllocator
 	IsSorterFull() ==
 	 	return forall id in set dom sorterRing & sorterRing(id).GetState() = <Full>;
 
-	-- Returns calculated throughput of soter capacity for current state of sorter ring
+	-- Returns calculated throughput of soter capacity 
+	-- for current state of sorter ring
 	public GetThroughput: () ==> ThroughputResult
 	GetThroughput () ==
 		CalculateThroughput(countTraySteps, rng sorterRing, countItemsInducted);
@@ -183,20 +188,25 @@ class TrayAllocator
 
 	-- Calculates the current throughput based on items on sorter ring 
 	/*
-	Calculation as sum of simulation time steps = number of steps * Tray`TraySize/SorterEnviroment`Speed
+	Calculation as sum of simulation time 
+    steps = number of steps * Tray`TraySize/SorterEnviroment`Speed
     throughput calculated as items inducted in simulation time converted to items/hour 
-    calculate the number of items inducted = number of tray with status equal <full> minus sum of two tray items divied by 2
+    calculate the number of 
+    items inducted = number of tray with status equal <full> 
+    minus sum of two tray items divied by 2
 	*/
 	private CalculateThroughput: nat * set of Tray * nat-> ThroughputResult
 	CalculateThroughput(steps, trays, items) ==
 		let runTime :real = steps * (Tray`Size/SorterEnviroment`Speed),
 			traysWithItems = {twi | twi in set trays & twi.IsTrayFull()},
-			traysWith2Items = {tw2i | tw2i in set traysWithItems & tw2i.GetItem() <> nil and tw2i.GetItem().GetSizeOfTrays() = 2},
+			traysWith2Items = {tw2i | tw2i in set traysWithItems & 
+			           tw2i.GetItem() <> nil and tw2i.GetItem().GetSizeOfTrays() = 2},
 			itemsOnSorter = card traysWithItems, 
-			twoTrayItemsOnSorter = card traysWith2Items,
+			twoTrayItemsOnSorter = card traysWith2Items / 2,
 			throughput = itemsOnSorter * SecInHour/runTime
 		in 
-			mk_ThroughputResult(itemsOnSorter, twoTrayItemsOnSorter, steps, items, throughput)
+			mk_ThroughputResult(itemsOnSorter, twoTrayItemsOnSorter, 
+			                    steps, items, throughput)
 	pre trays <> {};
 	
 

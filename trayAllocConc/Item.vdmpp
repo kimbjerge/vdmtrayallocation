@@ -1,17 +1,17 @@
--- ===============================================================================================================
+-- ===========================================================================
 -- Item in tray allocation for a sortation system
 -- By José Antonio Esparza and Kim Bjerge - spring 2010
--- ===============================================================================================================
+-- ===========================================================================
 
 class Item
 	types
 	    public ItemTraySize = nat1
-	    inv it == it <= MaxTrays;  	      -- Limitation on how many trays an item occupies 
+	    inv it == it <= MaxTrays;  	      -- Limitation on trays an items 
 
 	values
 		public MaxSize : nat = 1500;  	  -- Item maximum size in mm
 		public MinSize : nat = 100;   	  -- Item minimum size in mm
-		public MaxTrays: nat = 2;	      -- Maimum number of trays an item occupies
+		public MaxTrays: nat = 2;	      -- Number of trays an item occupies
 
 	instance variables
 	    id : nat;	   		 			  -- Item ID for induction
@@ -20,11 +20,7 @@ class Item
 	    
 	    sizeOfTrays : ItemTraySize; 	  -- Number of trays item occupies
 	    trays : set of Tray := {};
-	    
-	    -- If the item is on the sorter ring the size of trays the item occupies 
-	    -- must be equal to number of tray associations
-	    -- inv let t = card trays in t > 0 => sizeOfTrays = t;
-	      
+	    	      
 	operations
 	
     -- InductionController constructor
@@ -57,7 +53,7 @@ class Item
 	AssignItemToTray(tray) ==
 		trays := trays union {tray};
 
-	-- Release item from sorter ring - Implicit operation - not used yet !!!
+	-- Release item from sorter ring - Implicit operation
 	public ReleaseItemFromTrays ()
 	ext wr trays : set of Tray
 	post trays = {}; 
