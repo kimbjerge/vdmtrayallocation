@@ -1,0 +1,63 @@
+---------------------------------------------
+Tray allocation Conc model #1 : scenario3.txt
+- Mix of one and two tray items
+---------------------------------------------
+< 1 >< 2 >
+*Induction id 3 
+-> Item id 3 size 200 on tray id 10 
+*Induction id 2 
+-> Item id 2 size 800 on tray id 7 
+-> Item id 2 size 800 on tray id 8 
+*Induction id 1 
+-> Item id 1 size 100 on tray id 6 
+< 3 >< 4 >< 5 >
+*Induction id 2 
+-> Item id 5 size 400 on tray id 11 
+*Induction id 1 
+-> Item id 4 size 200 on tray id 9 
+< 6 >
+*Induction id 3 
+-> Item id 6 size 700 on tray id 13 
+-> Item id 6 size 700 on tray id 14 
+< 7 >< 8 >< 9 >
+*Induction id 2 
+-> Item id 8 size 300 on tray id 15 
+< 10 >< 11 >< 12 >< 13 >
+*Induction id 1 
+-> Item id 7 size 800 on tray id 16 
+-> Item id 7 size 800 on tray id 17 
+< 14 >
+*Induction id 3 
+-> Item id 9 size 400 on tray id 2 
+*Induction id 2 
+-> Item id 11 size 800 on tray id 19 
+-> Item id 11 size 800 on tray id 20 
+< 15 >< 16 >< 17 >< 18 >< 19 >< 20 >
+*Induction id 1 
+-> Item id 10 size 900 on tray id 3 
+-> Item id 10 size 900 on tray id 4 
+< 21 >< 22 >< 23 >< 24 >
+*Induction id 3 
+-> Item id 12 size 200 on tray id 12 
+---------------------------------------------
+Simulation completed for sorter configuration
+---------------------------------------------
+< 25 >Specified throughput [items/hour]: 10000 
+Sorter speed             [mm/sec]: 2000 
+Item max size                [mm]: 1500 
+Item min size                [mm]: 100 
+Tray size                    [mm]: 600 
+Number of trays                  : 20 
+Number of inductions             : 3 
+Induction rate                   : 2 
+Induction separation      [trays]: 2 
+----------------------------------------------
+Number of trays with items       : 17 
+Two tray items on sorter         : 5 
+Number of tray steps             : 24 
+Number of inducted items         : 12 
+Calculated throughput[items/hour]: 8500 
+----------------------------------------------
+      ****  Sorter is not full  ****
+----------------------------------------------
+new World().Run() = ()
