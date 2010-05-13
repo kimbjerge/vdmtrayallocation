@@ -77,7 +77,8 @@ class InductionController
 
 	sync
 		-- Enviroment and TrayAllocator threads
-		mutex (FeedItem);
+		-- mutex (FeedItem);
+		per FeedItem => #active(FeedItem) = 0; -- Equal to mutex
 		mutex (FeedItem, InductFirstItem);
 		mutex (WaitInductItem);
 								
